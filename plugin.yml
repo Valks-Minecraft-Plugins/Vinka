@@ -1,0 +1,11 @@
+name: Vinka
+main: com.vinka.Vinka
+author: valkyrienyanko
+version: 1.0
+api-version: 1.13
+depend: [WorldEdit]
+commands:
+   test:
+     description: Test command.
+     aliases: [t]
+     usage: /test
