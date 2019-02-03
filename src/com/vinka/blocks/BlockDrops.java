@@ -10,10 +10,11 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.valkutils.modules.BlockModule;
+import com.valkutils.modules.TextModule;
 import com.vinka.Vinka;
 import com.vinka.configs.PlayerFiles;
 import com.vinka.items.VinkaItems;
-import com.vinka.modules.BlockModule;
 import com.vinka.utils.Utils;
 
 public class BlockDrops {
@@ -56,7 +57,7 @@ public class BlockDrops {
 			ItemStack item5 = VinkaItems.GOLD_ORE();
 			item5.setAmount(amount);
 			e.getPlayer().getInventory().addItem(item5);
-			e.getPlayer().sendMessage(Utils.color("&7Some &flimonite ore &7was added to your inventory."));
+			e.getPlayer().sendMessage(TextModule.color("&7Some &flimonite ore &7was added to your inventory."));
 			e.getBlock().setType(Material.LAVA);
 			break;
 		case DIAMOND_ORE:
@@ -71,14 +72,6 @@ public class BlockDrops {
 			w.dropItemNaturally(loc, item3);
 			break;
 		case DIRT:
-			new BukkitRunnable() {
-				@Override
-				public void run() {
-					e.getBlock().setType(Material.COARSE_DIRT);
-				}
-			}.runTaskLater(Vinka.vinka, 2);
-			break;
-		case COARSE_DIRT:
 			ItemStack item8 = VinkaItems.DRIED_KELP();
 			item8.setAmount(amount);
 			w.dropItemNaturally(loc, item8);
@@ -137,6 +130,10 @@ public class BlockDrops {
 					config.set("achievement_1", true);
 					Utils.achievement(e.getPlayer(), "Just Getting Started");
 					cm.saveConfig();
+				}
+				
+				if (e.getPlayer().getEquipment().getItemInMainHand().getType() == Material.AIR) {
+					amount++;
 				}
 				
 				ItemStack item2 = VinkaItems.RABBIT_FOOT();

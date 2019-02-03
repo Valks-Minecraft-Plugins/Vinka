@@ -2,9 +2,10 @@ package com.vinka.blocks;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
-import com.vinka.modules.PlayerModule;
+import com.valkutils.modules.PlayerModule;
 
 public class GravityBlocks {
 	public static void gravityPlacedBlocks(Block b, Player p) {
@@ -23,8 +24,10 @@ public class GravityBlocks {
 		case WHITE_WOOL:
 		case OAK_STAIRS:
 			if (PlayerModule.inSurvival(p)) {
-				b.getWorld().spawnFallingBlock(b.getLocation().add(0.5d, 0, 0.5d), b.getBlockData());
-				b.setType(Material.AIR);
+				if (b.getRelative(BlockFace.DOWN).getType() == Material.AIR) {
+					b.getWorld().spawnFallingBlock(b.getLocation().add(0.5d, 0, 0.5d), b.getBlockData());
+					b.setType(Material.AIR);
+				}
 			}
 			break;
 		default:

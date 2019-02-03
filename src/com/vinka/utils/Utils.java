@@ -1,25 +1,30 @@
 package com.vinka.utils;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Random;
 
-import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Husk;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.FurnaceRecipe;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.ShapelessRecipe;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
+import com.valkutils.modules.BlockModule;
+import com.valkutils.modules.PlayerModule;
+import com.valkutils.modules.TextModule;
 import com.vinka.Vinka;
+import com.vinka.items.VinkaItems;
 
 public class Utils {
 	public static void achievement(Player p, String message) {
 		p.sendTitle("", message, 20, 60, 20);
-		Vinka.vinka.getServer().broadcastMessage(Utils.color("&f" + p.getPlayer().getName() + " &7just achieved &f" + message + "&7!"));
+		Vinka.vinka.getServer().broadcastMessage(TextModule.color("&f" + p.getPlayer().getName() + " &7just achieved &f" + message + "&7!"));
 	}
 	
 	/*
@@ -34,87 +39,93 @@ public class Utils {
 		}
 	}
 	
-	public static void craftedRecipe(String key, ItemStack item, String rows, ItemStack[] ingredients, String ids) {
-		NamespacedKey namespacedKey = new NamespacedKey(Vinka.vinka, key);
-		ShapedRecipe recipe = new ShapedRecipe(namespacedKey, item);
-		String row1 = rows.substring(0, 3);
-		String row2 = rows.substring(3, 6);
-		String row3 = rows.substring(6, 9);
-		recipe.shape(row1, row2, row3);
+	@SuppressWarnings("deprecation")
+	public static void updateToolDurability(Material blocktype, Player p, ItemStack item) {
+		if (PlayerModule.isTool(item.getType())) {
+			if (BlockModule.isPlant(blocktype)) return;
+			item.setDurability((short) (item.getDurability() + 1));
+			if (item.getDurability() + 1 > item.getType().getMaxDurability()) {
+				ItemStack sticks = VinkaItems.STICK();
+				sticks.setAmount(2);
+				p.getEquipment().setItemInMainHand(sticks);
+				p.sendMessage(TextModule.color("&7Your tool snapped in two."));
+			}
+		}
+	}
+	
+	public static int toolGatherAmount(Player p) {
+		int max = 1;
+		int min = 1;
 		
-		String[] the_ids = ids.split(",");
+		switch (p.getEquipment().getItemInMainHand().getType()) {
+		case WOODEN_AXE:
+		case WOODEN_HOE:
+		case WOODEN_SHOVEL:
+		case WOODEN_PICKAXE:
+			max = 3;
+			break;
+		case STONE_AXE:
+		case STONE_HOE:
+		case STONE_SHOVEL:
+		case STONE_PICKAXE:
+			max = 4;
+			break;
+		case IRON_AXE:
+		case IRON_HOE:
+		case IRON_SHOVEL:
+		case IRON_PICKAXE:
+			max = 5;
+			break;
+		case GOLDEN_AXE:
+		case GOLDEN_HOE:
+		case GOLDEN_SHOVEL:
+		case GOLDEN_PICKAXE:
+			max = 6;
+			break;
+		case DIAMOND_AXE:
+		case DIAMOND_HOE:
+		case DIAMOND_SHOVEL:
+		case DIAMOND_PICKAXE:
+			max = 7;
+			break;
+		default:
+			break;
+		}
 		
-		for (int i = 0; i < ingredients.length; i++) {
-			recipe.setIngredient(the_ids[i].charAt(0), ingredients[i].getType());
+		return new Random().nextInt(max - min + 1) + min;
+	}
+	
+	public static void spawnMonster(Location loc, EntityType type) {
+		LivingEntity monster = (LivingEntity) loc.getWorld().spawnEntity(loc, type);
+		monster.setSilent(true);
+		monster.getEquipment().setHelmet(new ItemStack(Material.BLACK_WOOL));
+		monster.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1));
+		if (monster instanceof Husk) {
+			((Husk) monster).setBaby(false);
 		}
-		Vinka.vinka.getServer().addRecipe(recipe);
-		Vinka.vinka.recipes.add(new NamespacedKey(Vinka.vinka, key));
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				monster.remove();
+			}
+		}.runTaskLater(Vinka.vinka, 1200);
 	}
 	
-	public static void handRecipe(String key, ItemStack item, String rows, ItemStack[] ingredients, String ids) {
-		NamespacedKey namespacedKey = new NamespacedKey(Vinka.vinka, key);
-		ShapedRecipe recipe = new ShapedRecipe(namespacedKey, item);
-		String row1 = rows.substring(0, 2);
-		String row2 = rows.substring(2, 4);
-		recipe.shape(row1, row2);
-		
-		String[] the_ids = ids.split(",");
-		
-		for (int i = 0; i < ingredients.length; i++) {
-			recipe.setIngredient(the_ids[i].charAt(0), ingredients[i].getType());
+	public static boolean validSpawningLocation(Location testLoc) {
+		if (testLoc.getBlock().getType() == Material.AIR
+				&& testLoc.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR) {
+			if (testLoc.getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
+				return true;
+			}
 		}
-		Vinka.vinka.getServer().addRecipe(recipe);
-		Vinka.vinka.recipes.add(new NamespacedKey(Vinka.vinka, key));
+		return false;
 	}
 	
-	/*
-	 * Time is in seconds.
-	 */
-	public static void furnaceRecipe(String key, ItemStack result, Material required, int time) {
-		NamespacedKey nameSpacedKey = new NamespacedKey(Vinka.vinka, key);
-		FurnaceRecipe recipe = new FurnaceRecipe(nameSpacedKey, result, required, 0f, time * 20);
-		Vinka.vinka.getServer().addRecipe(recipe);
-		Vinka.vinka.recipes.add(new NamespacedKey(Vinka.vinka, key));
-	}
-	
-	public static void shapelessRecipe(String key, ItemStack item, ItemStack[] ingredients) {
-		NamespacedKey namespacedKey = new NamespacedKey(Vinka.vinka, key);
-		ShapelessRecipe recipe = new ShapelessRecipe(namespacedKey, item);
-		for (ItemStack ingredient : ingredients) {
-			recipe.addIngredient(ingredient.getType());
-		}
-		Vinka.vinka.getServer().addRecipe(recipe);
-	}
-	
-	public static ItemStack item(String name, String lore, Material material) {
-		ItemStack item = new ItemStack(material);
-		ItemMeta im = item.getItemMeta();
-		im.setDisplayName(ChatColor.WHITE + color(name));
-		im.addItemFlags(ItemFlag.values());
-		List<String> list = new ArrayList<String>();
-		for (String element : lore.split("\n")) {
-			list.add(ChatColor.GRAY + color(element));
-		}
-		im.setLore(list);
-		item.setItemMeta(im);
-		return item;
-	}
-	
-	public static ItemStack tool(String name, String lore, Material material) {
-		ItemStack item = new ItemStack(material, 1);
-		ItemMeta im = item.getItemMeta();
-		im.setDisplayName(ChatColor.WHITE + color(name));
-		im.addItemFlags(ItemFlag.values());
-		List<String> list = new ArrayList<String>();
-		for (String element : lore.split("\n")) {
-			list.add(ChatColor.GRAY + color(element));
-		}
-		im.setLore(list);
-		item.setItemMeta(im);
-		return item;
-	}
-	
-	public static String color(String message) {
-		return ChatColor.translateAlternateColorCodes('&', message);
+	public static Location[] testLocations(Location loc, int radius) {
+		World w = loc.getWorld();
+		return new Location[]  { new Location(w, loc.getX() + radius, loc.getY(), loc.getZ()),
+				new Location(w, loc.getX() - radius, loc.getY(), loc.getZ()),
+				new Location(w, loc.getX(), loc.getY(), loc.getZ() + radius),
+				new Location(w, loc.getX(), loc.getY(), loc.getZ() - radius) };
 	}
 }

@@ -6,7 +6,6 @@ import org.bukkit.Sound;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,14 +18,14 @@ import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.valkutils.hologram.Hologram;
+import com.valkutils.modules.MobModule;
+import com.valkutils.modules.TextModule;
 import com.vinka.Vinka;
 import com.vinka.configs.PlayerFiles;
 import com.vinka.items.VinkaItems;
-import com.vinka.utils.Hologram;
 import com.vinka.utils.Utils;
 
 public class Mobs implements Listener {
@@ -36,7 +35,7 @@ public class Mobs implements Listener {
 		if (!(e.getEntity() instanceof Monster)) return;
 		if (e.getDamage() <= 0) return;
 		Location loc = e.getEntity().getLocation().getBlock().getRelative(BlockFace.DOWN).getLocation();
-		Hologram hg = new Hologram(loc.add(0.5d, 0, 0.5d), Utils.color("&c" + (int) e.getDamage()));
+		Hologram hg = new Hologram(loc.add(0.5d, 0, 0.5d), TextModule.color("&c" + (int) e.getDamage()));
 		hg.setVisible(true);
 		hg.move();
 		new BukkitRunnable() {
@@ -70,17 +69,10 @@ public class Mobs implements Listener {
 			loc.getWorld().dropItemNaturally(loc, VinkaItems.SUGAR());
 			loc.getWorld().playSound(loc, Sound.AMBIENT_CAVE, 1f, 1f);
 			
-			for (int i = 0; i < 2; i++) {
-				LivingEntity mob = (LivingEntity) loc.getWorld().spawnEntity(loc, EntityType.SILVERFISH);
-				mob.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 10000, 1));
-				new BukkitRunnable() {
-			        
-		            @Override
-		            public void run() {
-		                mob.remove();
-		            }
-		            
-		        }.runTaskLater(Vinka.vinka, 100);
+			if (MobModule.countMobs(loc.getWorld(), EntityType.HUSK) < 40) {
+				for (int i = 0; i < 2; i++) {
+					Utils.spawnMonster(loc, EntityType.HUSK);
+				}
 			}
 			
 			if (e.getEntity().getKiller() instanceof Player) {

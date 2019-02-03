@@ -1,13 +1,16 @@
 package com.vinka.blocks;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.LeavesDecayEvent;
-import com.vinka.modules.BlockModule;
-import com.vinka.modules.PlayerModule;
+
+import com.valkutils.modules.BlockModule;
+import com.valkutils.modules.PlayerModule;
+import com.vinka.utils.Utils;
 
 public class Blocks implements Listener {
 	@EventHandler
@@ -21,9 +24,9 @@ public class Blocks implements Listener {
 			return;
 		}
 
-		BlockDrops.blockDrops(e, PlayerModule.toolGatherAmount(p));
+		BlockDrops.blockDrops(e, Utils.toolGatherAmount(p));
 		BlockModule.treeGravity(e);
-		PlayerModule.updateToolDurability(p, p.getEquipment().getItemInMainHand());
+		Utils.updateToolDurability(e.getBlock().getType(), p, p.getEquipment().getItemInMainHand());
 		e.setExpToDrop(0);
 		e.setDropItems(false);
 	}
@@ -35,6 +38,7 @@ public class Blocks implements Listener {
 
 	@EventHandler
 	private void leafDecay(LeavesDecayEvent e) {
-		e.getBlock().getDrops().clear();
+		e.setCancelled(true);
+		e.getBlock().setType(Material.AIR);
 	}
 }
