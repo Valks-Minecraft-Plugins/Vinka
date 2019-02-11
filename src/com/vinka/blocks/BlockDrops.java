@@ -5,7 +5,6 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.data.Ageable;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -13,9 +12,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.valkutils.modules.BlockModule;
 import com.valkutils.modules.TextModule;
 import com.vinka.Vinka;
-import com.vinka.configs.PlayerFiles;
-import com.vinka.items.VinkaItems;
-import com.vinka.utils.Utils;
+import com.vinkaitems.VinkaItems;
 
 public class BlockDrops {
 	public static void blockDrops(BlockBreakEvent e, int amount) {
@@ -60,17 +57,62 @@ public class BlockDrops {
 			e.getPlayer().sendMessage(TextModule.color("&7Some &flimonite ore &7was added to your inventory."));
 			e.getBlock().setType(Material.LAVA);
 			break;
+		case EMERALD_ORE:
+			ItemStack emeralds = VinkaItems.UNREFINED_EMERALD();
+			emeralds.setAmount(amount);
+			w.dropItemNaturally(loc, emeralds);
 		case DIAMOND_ORE:
 			ItemStack item4 = VinkaItems.DIAMOND_ORE();
 			w.dropItemNaturally(loc, item4);
 			e.getBlock().setType(Material.WATER);
 			w.playSound(loc, Sound.AMBIENT_CAVE, 1f, 1f);
 			break;
+		case TNT:
+			w.dropItemNaturally(loc, VinkaItems.SUGAR());
+			break;
+		case OAK_SLAB:
+		case SIGN:
+			w.dropItemNaturally(loc, VinkaItems.RABBIT_FOOT());
+			break;
+		case OAK_PLANKS:
+		case WHITE_BANNER:
+		case OAK_FENCE_GATE:
+			w.dropItemNaturally(loc, VinkaItems.STICK());
+			break;
+		case FURNACE:
+			w.dropItemNaturally(loc, VinkaItems.STONE_BLOCK());
+			break;
+		case OAK_FENCE:
+		case CHEST:
+		case OAK_DOOR:
+			w.dropItemNaturally(loc, VinkaItems.OAK_PLANKS());
+			break;
+		case IRON_BLOCK:
+		case HOPPER:
+		case IRON_DOOR:
+		case IRON_TRAPDOOR:
+			w.dropItemNaturally(loc, VinkaItems.REFINED_IRON_ORE());
+			break;
+		case WHITE_BED:
+			w.dropItemNaturally(loc, VinkaItems.WHITE_WOOL());
+			w.dropItemNaturally(loc, VinkaItems.OAK_PLANKS());
+			break;
+		case CRAFTING_TABLE:
+			ItemStack some_iron = VinkaItems.REFINED_IRON_ORE();
+			some_iron.setAmount(3);
+			w.dropItemNaturally(loc, some_iron);
+			break;
+		case COBBLESTONE:
+		case STONE_SLAB:
+			w.dropItemNaturally(loc, VinkaItems.GRAY_DYE());
+			break;
 		case STONE:
 			ItemStack item3 = VinkaItems.GRAY_DYE();
 			item3.setAmount(amount);
 			w.dropItemNaturally(loc, item3);
 			break;
+		case GRASS_BLOCK:
+		case GRASS_PATH:
 		case DIRT:
 			ItemStack item8 = VinkaItems.DRIED_KELP();
 			item8.setAmount(amount);
@@ -122,16 +164,7 @@ public class BlockDrops {
 				}
 			}
 
-			if (BlockModule.isLog(e.getBlock().getType())) {
-				PlayerFiles cm = PlayerFiles.getConfig(e.getPlayer());
-				FileConfiguration config = cm.getConfig();
-				
-				if (!config.getBoolean("achievement_1")) {
-					config.set("achievement_1", true);
-					Utils.achievement(e.getPlayer(), "Just Getting Started");
-					cm.saveConfig();
-				}
-				
+			if (BlockModule.isLog(e.getBlock().getType())) {					
 				if (e.getPlayer().getEquipment().getItemInMainHand().getType() == Material.AIR) {
 					amount++;
 				}

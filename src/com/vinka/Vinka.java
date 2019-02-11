@@ -1,7 +1,10 @@
 package com.vinka;
 
+import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Monster;
@@ -11,15 +14,18 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.vinka.blocks.BlockGrow;
 import com.vinka.blocks.BlockStrippedWood;
 import com.vinka.blocks.Blocks;
 import com.vinka.configs.LoadPlayerFiles;
 import com.vinka.consumables.Food;
-import com.vinka.dungeons.SleepTeleport;
-import com.vinka.items.VinkaItems;
+import com.vinka.listeners.CustomPlayerRespawnEventListener;
+import com.vinka.mobs.MobDeath;
+import com.vinka.mobs.MobInteract;
 import com.vinka.mobs.Mobs;
 import com.vinka.player.PlayerHandler;
 import com.vinka.utils.Utils;
+import com.vinkaitems.VinkaItems;
 import com.valkutils.modules.ItemModule;
 
 public class Vinka extends JavaPlugin {
@@ -28,18 +34,62 @@ public class Vinka extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		vinka = this;
-		getServer().clearRecipes();
+		
+		Server s = getServer();
+
+		setGameRules(s);
+		
+		s.clearRecipes();
 		addRecipes();
 
-		registerListeners(getServer().getPluginManager());
+		registerListeners(s);
 		registerCommands();
 
+		handleSpawning(s);
+	}
+	
+	private void setGameRules(Server s) {
+		World w = s.getWorld("world");
+		w.setGameRule(GameRule.DO_FIRE_TICK, false);
+		w.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+		w.setGameRule(GameRule.COMMAND_BLOCK_OUTPUT, false);
+		w.setGameRule(GameRule.DO_MOB_LOOT, false);
+		w.setGameRule(GameRule.DO_ENTITY_DROPS, false);
+		w.setGameRule(GameRule.DO_TILE_DROPS, false);
+		w.setGameRule(GameRule.KEEP_INVENTORY, false);
+		w.setGameRule(GameRule.MOB_GRIEFING, false);
+	}
+	
+	private void registerCommands() {
+		//getCommand("test").setExecutor(new CommandTest());
+	}
+
+	private void registerListeners(Server s) {
+		PluginManager pm = s.getPluginManager();
+		pm.registerEvents(new BlockGrow(), this);
+		pm.registerEvents(new BlockStrippedWood(), this);
+		pm.registerEvents(new Blocks(), this);
+		
+		pm.registerEvents(new Food(), this);
+		
+		pm.registerEvents(new Mobs(), this);
+		pm.registerEvents(new MobDeath(), this);
+		pm.registerEvents(new MobInteract(), this);
+		
+		pm.registerEvents(new PlayerHandler(), this);
+		
+		pm.registerEvents(new LoadPlayerFiles(), this);
+		
+		pm.registerEvents(new CustomPlayerRespawnEventListener(), this);
+	}
+	
+	private void handleSpawning(Server s) {
 		int radius = 30;
 
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				for (Player p : getServer().getOnlinePlayers()) {
+				for (Player p : s.getOnlinePlayers()) {
 					int count = 0;
 					for (Entity entity : p.getNearbyEntities(radius, 5, radius)) {
 						if (entity instanceof Monster) {
@@ -51,34 +101,59 @@ public class Vinka extends JavaPlugin {
 						Location loc = p.getLocation();
 
 						for (Location testLoc : Utils.testLocations(loc, radius)) {
-							if (Utils.validSpawningLocation(testLoc)) {
-								Utils.spawnMonster(testLoc, EntityType.HUSK);
+							Location highestBlockTest = loc.getWorld().getHighestBlockAt(testLoc).getLocation();
+							if (Utils.validSpawningLocation(highestBlockTest)) {
+								
+								double dist = loc.distance(loc.getWorld().getSpawnLocation());
+								if (dist >= 0 && dist <= 100) {
+									Utils.spawnMonster(highestBlockTest, EntityType.SLIME, null);
+								} else {
+									Utils.spawnMonster(highestBlockTest, EntityType.HUSK, null);
+								}
 								return;
 							}
 						}
 					}
 				}
 			}
-		}.runTaskTimer(this, 200, 600);
-	}
-	
-	private void registerCommands() {
-		//getCommand("test").setExecutor(new CommandTest());
-	}
-
-	private void registerListeners(PluginManager pm) {
-		pm.registerEvents(new Blocks(), this);
-		pm.registerEvents(new Food(), this);
-		pm.registerEvents(new Mobs(), this);
-		pm.registerEvents(new PlayerHandler(), this);
-		pm.registerEvents(new SleepTeleport(), this);
-		pm.registerEvents(new LoadPlayerFiles(), this);
-		pm.registerEvents(new BlockStrippedWood(), this);
+		}.runTaskTimer(this, 200, 300);
 	}
 
 	private void addRecipes() {
+		ItemModule.shapelessRecipe("SEA_LANTERN", VinkaItems.SEA_LANTERN(), new ItemStack[] {new ItemStack(Material.GLOWSTONE)});
+		
+		ItemModule.handRecipe("GLOWSTONE_BLOCK", VinkaItems.GLOWSTONE_BLOCK(), "xxxx", new ItemStack[] {new ItemStack(Material.TORCH)}, "x");
+		ItemModule.handRecipe("TORCH", VinkaItems.TORCH(), "xxxx", new ItemStack[] {new ItemStack(Material.REDSTONE_TORCH)}, "x");
+		ItemModule.shapelessRecipe("OAK_SAPLING", VinkaItems.OAK_SAPLING(), new ItemStack[] {new ItemStack(Material.SUGAR)});
+		
+		ItemModule.craftedRecipe("DIAMOND_HORSE_ARMOR", VinkaItems.DIAMOND_HORSE_ARMOR(), "ooooooxxx", new ItemStack[] {new ItemStack(Material.DIAMOND)}, "x");
+		ItemModule.craftedRecipe("GOLDEN_HORSE_ARMOR", VinkaItems.GOLD_HORSE_ARMOR(), "ooooooxxx", new ItemStack[] {new ItemStack(Material.GOLD_INGOT)}, "x");
+		ItemModule.craftedRecipe("IRON_HORSE_ARMOR", VinkaItems.IRON_HORSE_ARMOR(), "ooooooxxx", new ItemStack[] {new ItemStack(Material.IRON_INGOT)}, "x");
+		
+		ItemModule.shapelessRecipe("MULE_SPAWN_EGG", VinkaItems.MULE_SPAWN_EGG(), new ItemStack[] {new ItemStack(Material.LLAMA_SPAWN_EGG)});
+		ItemModule.shapelessRecipe("LLAMA_SPAWN_EGG", VinkaItems.LLAMA_SPAWN_EGG(), new ItemStack[] {new ItemStack(Material.DONKEY_SPAWN_EGG)});
+		ItemModule.shapelessRecipe("DONKEY_SPAWN_EGG", VinkaItems.DONKEY_SPAWN_EGG(), new ItemStack[] {new ItemStack(Material.HORSE_SPAWN_EGG)});
+		ItemModule.craftedRecipe("WOLF_SPAWN_EGG", VinkaItems.WOLF_SPAWN_EGG(), "xxxxaxxxx", new ItemStack[] {new ItemStack(Material.SUGAR), new ItemStack(Material.BEETROOT_SEEDS)}, "x,a");
+		ItemModule.craftedRecipe("HORSE_SPAWN_EGG", VinkaItems.HORSE_SPAWN_EGG(), "xxxxaxxxx", new ItemStack[] {new ItemStack(Material.SUGAR), new ItemStack(Material.WHEAT_SEEDS)}, "x,a");
+		ItemModule.craftedRecipe("SHEEP_SPAWN_EGG", VinkaItems.SHEEP_SPAWN_EGG(), "xxxxaxxxx", new ItemStack[] {new ItemStack(Material.SUGAR), new ItemStack(Material.IRON_INGOT)}, "x,a");
+		ItemModule.craftedRecipe("VILLAGER_SPAWN_EGG", VinkaItems.VILLAGER_SPAWN_EGG(), "xxxxaxxxx", new ItemStack[] {new ItemStack(Material.SUGAR), new ItemStack(Material.EMERALD)}, "x,a");
+		ItemModule.craftedRecipe("CHICKEN_SPAWN_EGG", VinkaItems.CHICKEN_SPAWN_EGG(), "xxxxaxxxx", new ItemStack[] {new ItemStack(Material.SUGAR), new ItemStack(Material.DIAMOND)}, "x,a");
+		
 		ItemModule.craftedRecipe("IRON_ORE_FROM_LIGHT_GRAY_DYE_ORE", VinkaItems.IRON_ORE(), "xxxxxxxxx", new ItemStack[] {new ItemStack(Material.LIGHT_GRAY_DYE)}, "x");
 
+		ItemModule.handRecipe("LEAD", VinkaItems.LEAD(), "osso", new ItemStack[] {new ItemStack(Material.STICK)}, "s");
+		ItemModule.craftedRecipe("SADDLE", VinkaItems.SADDLE(), "xoxxaxxxx", new ItemStack[] {new ItemStack(Material.WHEAT_SEEDS), new ItemStack(Material.IRON_INGOT)}, "x,a");
+		ItemModule.handRecipe("OBSIDIAN", VinkaItems.OBSIDIAN(), "xxxx", new ItemStack[] {new ItemStack(Material.DIAMOND)}, "x");
+		ItemModule.handRecipe("ENCHANTMENT_TABLE", VinkaItems.ENCHANTMENT_TABLE(), "xxxx", new ItemStack[] {new ItemStack(Material.OBSIDIAN)}, "x");
+		ItemModule.handRecipe("BREWER", VinkaItems.BREWING_STAND(), "xxxx", new ItemStack[] {new ItemStack(Material.WHEAT_SEEDS)}, "x");
+		ItemModule.handRecipe("CAULDRON", VinkaItems.CAULDRON(), "bbaa", new ItemStack[] {new ItemStack(Material.STONE), new ItemStack(Material.STONE_SLAB)}, "a,b");
+		ItemModule.handRecipe("ELYTRA", VinkaItems.ELYTRA(), "xxxx", new ItemStack[] {new ItemStack(Material.EMERALD)}, "x");
+		ItemModule.handRecipe("REDSTONE", VinkaItems.REDSTONE(), "xxxx", new ItemStack[] {new ItemStack(Material.BEETROOT)}, "x");
+		ItemModule.handRecipe("PISTON", VinkaItems.PISTON(), "abab", new ItemStack[] {new ItemStack(Material.REDSTONE), new ItemStack(Material.OAK_PLANKS)}, "a,b");
+		ItemModule.shapelessRecipe("STICKY_PISTON", VinkaItems.STICKY_PISTON(), new ItemStack[] {new ItemStack(Material.PISTON)});
+		ItemModule.handRecipe("DISPENSER", VinkaItems.DISPENSER(), "xxxx", new ItemStack[] {new ItemStack(Material.REDSTONE)}, "x");
+		
+		
 		// WOOD RECIPES
 		ItemModule.handRecipe("SIGN", VinkaItems.SIGN(), "xxss",
 				new ItemStack[] { new ItemStack(Material.OAK_SLAB), new ItemStack(Material.STICK) }, "x,s");
@@ -97,8 +172,15 @@ public class Vinka extends JavaPlugin {
 		ItemModule.handRecipe("OAK_GATE", VinkaItems.OAK_FENCE_GATE(), "swws",
 				new ItemStack[] { new ItemStack(Material.STICK), new ItemStack(Material.OAK_SLAB) }, "s,w");
 		ItemModule.handRecipe("LADDER", VinkaItems.LADDER(), "xoxo", new ItemStack[] { new ItemStack(Material.STICK) }, "x");
-		ItemModule.handRecipe("REDSTONE_TORCH", VinkaItems.REDSTONE_TORCH(), "coso",
+		
+		ItemStack moreRedstoneTorches = VinkaItems.REDSTONE_TORCH();
+		moreRedstoneTorches.setAmount(2);
+		
+		ItemModule.handRecipe("REDSTONE_TORCH", moreRedstoneTorches, "coso",
 				new ItemStack[] { new ItemStack(Material.COAL), new ItemStack(Material.STICK) }, "c,s");
+		
+		
+		
 		ItemModule.handRecipe("FISHING_ROD", VinkaItems.FISHING_ROD(), "ocso",
 				new ItemStack[] { new ItemStack(Material.STRING), new ItemStack(Material.STICK) }, "c,s");
 		ItemModule.handRecipe("OAK_PRESSURE_PLATE", VinkaItems.OAK_PRESSURE_PLATE(), "xoxo",
@@ -175,6 +257,7 @@ public class Vinka extends JavaPlugin {
 		ItemModule.furnaceRecipe("REFINED_IRON_ORE", VinkaItems.REFINED_IRON_ORE(), Material.LIGHT_GRAY_DYE, 5);
 		ItemModule.furnaceRecipe("REFINED_GOLD_ORE", VinkaItems.REFINED_GOLD_ORE(), Material.DANDELION_YELLOW, 30);
 		ItemModule.furnaceRecipe("REFINED_DIAMOND_ORE", VinkaItems.REFINED_DIAMOND_ORE(), Material.LIGHT_BLUE_DYE, 60);
+		ItemModule.furnaceRecipe("REFINED_EMERALD", VinkaItems.REFINED_EMERALD(), Material.LIME_DYE, 60);
 
 		// Tools
 		ItemModule.handRecipe("STONE_PICK", VinkaItems.STONE_PICKAXE(), "xxsx",
@@ -259,12 +342,11 @@ public class Vinka extends JavaPlugin {
 		// Iron Age
 		ItemModule.handRecipe("IRON_BLOCK", VinkaItems.IRON_BLOCK(), "xxxx",
 				new ItemStack[] { new ItemStack(Material.IRON_INGOT) }, "x");
-		ItemModule.handRecipe("CRAFTING_TABLE", VinkaItems.CRAFTING_TABLE(), "abcd",
-				new ItemStack[] { new ItemStack(Material.IRON_AXE), new ItemStack(Material.IRON_PICKAXE),
-						new ItemStack(Material.IRON_HOE), new ItemStack(Material.IRON_SHOVEL) },
-				"a,b,c,d");
 		
-		ItemModule.handRecipe("GOLD_INGOT", VinkaItems.GOLD_ORE(), "xxxxxxxxx", new ItemStack[] {new ItemStack(Material.IRON_INGOT)}, "x");
+		ItemModule.shapelessRecipe("CRAFTING_TABLE", VinkaItems.CRAFTING_TABLE(), new ItemStack[] { new ItemStack(Material.IRON_AXE), new ItemStack(Material.IRON_PICKAXE),
+				new ItemStack(Material.IRON_HOE), new ItemStack(Material.IRON_SHOVEL) });
+		
+		ItemModule.handRecipe("UNREFINED_GOLD", VinkaItems.GOLD_ORE(), "xxxx", new ItemStack[] {new ItemStack(Material.IRON_INGOT)}, "x");
 
 		// Tools
 		ItemModule.handRecipe("IRON_PICK", VinkaItems.IRON_PICKAXE(), "xxsx",
@@ -305,7 +387,5 @@ public class Vinka extends JavaPlugin {
 				new ItemStack[] { new ItemStack(Material.DIAMOND), new ItemStack(Material.STICK) }, "x,s");
 		ItemModule.handRecipe("DIAMOND_SWORD", VinkaItems.DIAMOND_SWORD(), "oxsx",
 				new ItemStack[] { new ItemStack(Material.DIAMOND), new ItemStack(Material.STICK) }, "x,s");
-		
-		ItemModule.handRecipe("DIAMOND_BLOCK", VinkaItems.DIAMOND_BLOCK(), "xxxx", new ItemStack[] {new ItemStack(Material.DIAMOND)}, "x");
 	}
 }

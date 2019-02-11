@@ -23,6 +23,11 @@ public class Blocks implements Listener {
 			e.setCancelled(true);
 			return;
 		}
+		
+		if (e.getPlayer().getEquipment().getItemInMainHand().getType() == Material.DIAMOND_PICKAXE) {
+			if (e.getPlayer().isSneaking())
+				Utils.superPickaxe(e.getBlock().getLocation());
+		}
 
 		BlockDrops.blockDrops(e, Utils.toolGatherAmount(p));
 		BlockModule.treeGravity(e);
