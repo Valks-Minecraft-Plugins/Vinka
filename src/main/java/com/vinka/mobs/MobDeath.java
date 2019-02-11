@@ -27,8 +27,9 @@ public class MobDeath implements Listener {
 	@EventHandler
 	private void entityDeathEvent(EntityDeathEvent e) {
 		Entity entity = e.getEntity();
-		Location loc = entity.getLocation();
-		World w = loc.getWorld();
+		Location entityLocation = entity.getLocation();
+		World w = entityLocation.getWorld();
+		Location loc = w.getHighestBlockAt(entityLocation).getLocation();
 
 		w.playSound(loc, Sound.AMBIENT_CAVE, 1f, 1f);
 

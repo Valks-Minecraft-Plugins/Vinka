@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -82,7 +83,8 @@ public class CustomPlayerDeathEventListener implements Listener {
 				if (p.getBedSpawnLocation() != null) {
 					p.teleport(p.getBedSpawnLocation());
 				} else {
-					p.teleport(p.getWorld().getSpawnLocation());
+					World world = Bukkit.getWorld("world");
+					p.teleport(world.getSpawnLocation());
 				}
 				p.setGameMode(GameMode.SURVIVAL);
 				p.setFlySpeed(0.1f);

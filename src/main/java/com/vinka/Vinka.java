@@ -44,6 +44,11 @@ public class Vinka extends JavaPlugin {
 		s.clearRecipes();
 		addRecipes();
 
+		ItemModule.handRecipeHomeInv();
+		ItemModule.furnaceRecipeHomeInv();
+		ItemModule.craftingRecipeHomeInv();
+		ItemModule.shapelessRecipeHomeInv();
+
 		registerListeners(s);
 		registerCommands();
 
@@ -109,10 +114,11 @@ public class Vinka extends JavaPlugin {
 							if (Utils.validSpawningLocation(loc)) {
 
 								if (loc.getWorld().getName().equals("world")) {
-									int dist = (int) playerLocation.distance(playerLocation.getWorld().getSpawnLocation());
+									int dist = (int) playerLocation
+											.distance(playerLocation.getWorld().getSpawnLocation());
 
 									for (int i = 0; i < 10; i++) {
-										if (!spawnRange(dist, 100 * i, 100 * (i + 1)))
+										if (!spawnRange(dist, 300 * i, 300 * (i + 1)))
 											continue;
 										switch (i) {
 										case 0:
@@ -122,30 +128,18 @@ public class Vinka extends JavaPlugin {
 											Utils.spawnMonster(loc, EntityType.ZOMBIE);
 											break;
 										case 2:
-											Utils.spawnMonster(loc, EntityType.STRAY);
-											break;
-										case 3:
 											Utils.spawnMonster(loc, EntityType.HUSK);
 											break;
-										case 4:
-											Utils.spawnMonster(loc, EntityType.WOLF);
-											break;
-										case 5:
-											Utils.spawnMonster(loc, EntityType.CAVE_SPIDER);
-											break;
-										case 6:
+										case 3:
 											Utils.spawnMonster(loc, EntityType.SPIDER);
 											break;
-										case 7:
+										case 4:
 											Utils.spawnMonster(loc, EntityType.PHANTOM);
 											break;
-										case 8:
-											Utils.spawnMonster(loc, EntityType.VEX);
-											break;
-										case 9:
+										case 5:
 											Utils.spawnMonster(loc, EntityType.WITHER_SKELETON);
 											break;
-										case 10:
+										case 6:
 											Utils.spawnMonster(loc, EntityType.WITHER);
 											break;
 										default:
@@ -153,9 +147,11 @@ public class Vinka extends JavaPlugin {
 										}
 									}
 								} else {
-									Utils.spawnMonster(loc, EntityType.WITHER_SKELETON);
+									Location higherLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() + 30,
+											loc.getZ());
+									Utils.spawnMonster(higherLoc, EntityType.GHAST);
 								}
-								
+
 								return;
 							}
 						}
@@ -169,327 +165,286 @@ public class Vinka extends JavaPlugin {
 		return dist >= minDist && dist <= maxDist;
 	}
 
-	private void addRecipes() {
-		ItemModule.handRecipe("SHEARS", VinkaItems.SHEARS(), "oxxo", new ItemStack[] {new ItemStack(Material.IRON_INGOT)}, "x");
-		ItemModule.handRecipe("FLINT_AND_STEEL", VinkaItems.FLINT_AND_STEEL(), "xoox", new ItemStack[] {new ItemStack(Material.IRON_INGOT)}, "x");
-		
-		ItemModule.shapelessRecipe("SEA_LANTERN", VinkaItems.SEA_LANTERN(),
-				new ItemStack[] { new ItemStack(Material.GLOWSTONE) });
-
-		ItemModule.handRecipe("GLOWSTONE_BLOCK", VinkaItems.GLOWSTONE_BLOCK(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.TORCH) }, "x");
-		ItemModule.handRecipe("TORCH", VinkaItems.TORCH(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.REDSTONE_TORCH) }, "x");
-		ItemModule.shapelessRecipe("OAK_SAPLING", VinkaItems.OAK_SAPLING(),
-				new ItemStack[] { new ItemStack(Material.SUGAR) });
-
-		ItemModule.craftedRecipe("DIAMOND_HORSE_ARMOR", VinkaItems.DIAMOND_HORSE_ARMOR(), "ooooooxxx",
-				new ItemStack[] { new ItemStack(Material.DIAMOND) }, "x");
-		ItemModule.craftedRecipe("GOLDEN_HORSE_ARMOR", VinkaItems.GOLD_HORSE_ARMOR(), "ooooooxxx",
-				new ItemStack[] { new ItemStack(Material.GOLD_INGOT) }, "x");
-		ItemModule.craftedRecipe("IRON_HORSE_ARMOR", VinkaItems.IRON_HORSE_ARMOR(), "ooooooxxx",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT) }, "x");
-
-		ItemModule.shapelessRecipe("MULE_SPAWN_EGG", VinkaItems.MULE_SPAWN_EGG(),
-				new ItemStack[] { new ItemStack(Material.LLAMA_SPAWN_EGG) });
-		ItemModule.shapelessRecipe("LLAMA_SPAWN_EGG", VinkaItems.LLAMA_SPAWN_EGG(),
-				new ItemStack[] { new ItemStack(Material.DONKEY_SPAWN_EGG) });
-		ItemModule.shapelessRecipe("DONKEY_SPAWN_EGG", VinkaItems.DONKEY_SPAWN_EGG(),
-				new ItemStack[] { new ItemStack(Material.HORSE_SPAWN_EGG) });
-		ItemModule.craftedRecipe("WOLF_SPAWN_EGG", VinkaItems.WOLF_SPAWN_EGG(), "xxxxaxxxx",
-				new ItemStack[] { new ItemStack(Material.SUGAR), new ItemStack(Material.BEETROOT_SEEDS) }, "x,a");
-		ItemModule.craftedRecipe("HORSE_SPAWN_EGG", VinkaItems.HORSE_SPAWN_EGG(), "xxxxaxxxx",
-				new ItemStack[] { new ItemStack(Material.SUGAR), new ItemStack(Material.WHEAT_SEEDS) }, "x,a");
-		ItemModule.craftedRecipe("SHEEP_SPAWN_EGG", VinkaItems.SHEEP_SPAWN_EGG(), "xxxxaxxxx",
-				new ItemStack[] { new ItemStack(Material.SUGAR), new ItemStack(Material.IRON_INGOT) }, "x,a");
-		ItemModule.craftedRecipe("VILLAGER_SPAWN_EGG", VinkaItems.VILLAGER_SPAWN_EGG(), "xxxxaxxxx",
-				new ItemStack[] { new ItemStack(Material.SUGAR), new ItemStack(Material.EMERALD) }, "x,a");
-		ItemModule.craftedRecipe("CHICKEN_SPAWN_EGG", VinkaItems.CHICKEN_SPAWN_EGG(), "xxxxaxxxx",
-				new ItemStack[] { new ItemStack(Material.SUGAR), new ItemStack(Material.DIAMOND) }, "x,a");
-
-		ItemModule.craftedRecipe("IRON_ORE_FROM_LIGHT_GRAY_DYE_ORE", VinkaItems.IRON_ORE(), "xxxxxxxxx",
-				new ItemStack[] { new ItemStack(Material.LIGHT_GRAY_DYE) }, "x");
-
-		ItemModule.handRecipe("LEAD", VinkaItems.LEAD(), "osso", new ItemStack[] { new ItemStack(Material.STICK) },
-				"s");
-		ItemModule.craftedRecipe("SADDLE", VinkaItems.SADDLE(), "xoxxaxxxx",
-				new ItemStack[] { new ItemStack(Material.WHEAT_SEEDS), new ItemStack(Material.IRON_INGOT) }, "x,a");
-		ItemModule.handRecipe("OBSIDIAN", VinkaItems.OBSIDIAN(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.DIAMOND) }, "x");
-		ItemModule.handRecipe("ENCHANTMENT_TABLE", VinkaItems.ENCHANTMENT_TABLE(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.OBSIDIAN) }, "x");
-		ItemModule.handRecipe("BREWER", VinkaItems.BREWING_STAND(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.WHEAT_SEEDS) }, "x");
-		ItemModule.handRecipe("CAULDRON", VinkaItems.CAULDRON(), "bbaa",
-				new ItemStack[] { new ItemStack(Material.STONE), new ItemStack(Material.STONE_SLAB) }, "a,b");
-		ItemModule.handRecipe("ELYTRA", VinkaItems.ELYTRA(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.EMERALD) }, "x");
-		ItemModule.handRecipe("REDSTONE", VinkaItems.REDSTONE(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.BEETROOT) }, "x");
-		ItemModule.handRecipe("PISTON", VinkaItems.PISTON(), "abab",
-				new ItemStack[] { new ItemStack(Material.REDSTONE), new ItemStack(Material.OAK_PLANKS) }, "a,b");
-		ItemModule.shapelessRecipe("STICKY_PISTON", VinkaItems.STICKY_PISTON(),
-				new ItemStack[] { new ItemStack(Material.PISTON) });
-		ItemModule.handRecipe("DISPENSER", VinkaItems.DISPENSER(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.REDSTONE) }, "x");
-
-		// WOOD RECIPES
-		ItemModule.handRecipe("SIGN", VinkaItems.SIGN(), "xxss",
-				new ItemStack[] { new ItemStack(Material.OAK_SLAB), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("OAK_DOOR", VinkaItems.OAK_DOOR(), "xoxo",
-				new ItemStack[] { new ItemStack(Material.OAK_PLANKS) }, "x");
-		ItemModule.handRecipe("OAK_SLAB", VinkaItems.OAK_SLAB(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.RABBIT_FOOT) }, "x");
-		ItemModule.handRecipe("OAK_PLANKS", VinkaItems.OAK_PLANKS(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.OAK_SLAB) }, "x");
-		ItemModule.handRecipe("CHEST", VinkaItems.CHEST(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.OAK_PLANKS) }, "x");
-		ItemModule.handRecipe("OAK_TRAPDOOR", VinkaItems.OAK_TRAPDOOR(), "ooxx",
-				new ItemStack[] { new ItemStack(Material.OAK_SLAB) }, "x");
-		ItemModule.handRecipe("OAK_FENCE", VinkaItems.OAK_FENCE(), "ssww",
-				new ItemStack[] { new ItemStack(Material.OAK_SLAB), new ItemStack(Material.OAK_PLANKS) }, "s,w");
-		ItemModule.handRecipe("OAK_GATE", VinkaItems.OAK_FENCE_GATE(), "swws",
-				new ItemStack[] { new ItemStack(Material.STICK), new ItemStack(Material.OAK_SLAB) }, "s,w");
-		ItemModule.handRecipe("LADDER", VinkaItems.LADDER(), "xoxo", new ItemStack[] { new ItemStack(Material.STICK) },
+	private void addHandRecipes() {
+		ItemModule.handRecipe("BONE_MEAL", VinkaItems.BONEMEAL(), "xxoo", new ItemStack[] { VinkaItems.SUGAR() }, "x");
+		ItemModule.handRecipe("SHEARS", VinkaItems.SHEARS(), "oxxo", new ItemStack[] { VinkaItems.REFINED_IRON_ORE() },
 				"x");
-
+		ItemModule.handRecipe("FLINT_AND_STEEL", VinkaItems.FLINT_AND_STEEL(), "xoox",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE() }, "x");
+		ItemModule.handRecipe("GLOWSTONE_BLOCK", VinkaItems.GLOWSTONE_BLOCK(), "xxxx",
+				new ItemStack[] { VinkaItems.TORCH() }, "x");
+		ItemModule.handRecipe("TORCH", VinkaItems.TORCH(), "xxxx", new ItemStack[] { VinkaItems.REDSTONE_TORCH() },
+				"x");
+		ItemModule.handRecipe("LEAD", VinkaItems.LEAD(), "osso", new ItemStack[] { VinkaItems.STICK() }, "s");
+		ItemModule.handRecipe("OBSIDIAN", VinkaItems.OBSIDIAN(), "xxxx",
+				new ItemStack[] { VinkaItems.REFINED_DIAMOND_ORE() }, "x");
+		ItemModule.handRecipe("ENCHANTMENT_TABLE", VinkaItems.ENCHANTMENT_TABLE(), "xxxx",
+				new ItemStack[] { VinkaItems.OBSIDIAN() }, "x");
+		ItemModule.handRecipe("BREWER", VinkaItems.BREWING_STAND(), "xxxx",
+				new ItemStack[] { VinkaItems.WHEAT_SEEDS() }, "x");
+		ItemModule.handRecipe("CAULDRON", VinkaItems.CAULDRON(), "bbaa",
+				new ItemStack[] { VinkaItems.STONE_BLOCK(), VinkaItems.STONE_SLAB() }, "a,b");
+		ItemModule.handRecipe("ELYTRA", VinkaItems.ELYTRA(), "xxxx", new ItemStack[] { VinkaItems.REFINED_EMERALD() },
+				"x");
+		ItemModule.handRecipe("REDSTONE", VinkaItems.REDSTONE(), "xxxx", new ItemStack[] { VinkaItems.BEETROOT() },
+				"x");
+		ItemModule.handRecipe("PISTON", VinkaItems.PISTON(), "abab",
+				new ItemStack[] { VinkaItems.REDSTONE(), VinkaItems.OAK_PLANKS() }, "a,b");
+		ItemModule.shapelessRecipe("STICKY_PISTON", VinkaItems.STICKY_PISTON(),
+				new ItemStack[] { VinkaItems.STICKY_PISTON() });
+		ItemModule.handRecipe("DISPENSER", VinkaItems.DISPENSER(), "xxxx", new ItemStack[] { VinkaItems.REDSTONE() },
+				"x");
+		ItemModule.handRecipe("SIGN", VinkaItems.SIGN(), "xxss",
+				new ItemStack[] { VinkaItems.OAK_SLAB(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("OAK_DOOR", VinkaItems.OAK_DOOR(), "xoxo", new ItemStack[] { VinkaItems.OAK_PLANKS() },
+				"x");
+		ItemModule.handRecipe("OAK_SLAB", VinkaItems.OAK_SLAB(), "xxxx", new ItemStack[] { VinkaItems.RABBIT_FOOT() },
+				"x");
+		ItemModule.handRecipe("OAK_PLANKS", VinkaItems.OAK_PLANKS(), "xxxx", new ItemStack[] { VinkaItems.OAK_SLAB() },
+				"x");
+		ItemModule.handRecipe("CHEST", VinkaItems.CHEST(), "xxxx", new ItemStack[] { VinkaItems.OAK_PLANKS() }, "x");
+		ItemModule.handRecipe("OAK_TRAPDOOR", VinkaItems.OAK_TRAPDOOR(), "ooxx",
+				new ItemStack[] { VinkaItems.OAK_SLAB() }, "x");
+		ItemModule.handRecipe("OAK_FENCE", VinkaItems.OAK_FENCE(), "ssww",
+				new ItemStack[] { VinkaItems.OAK_SLAB(), VinkaItems.OAK_PLANKS() }, "s,w");
+		ItemModule.handRecipe("OAK_GATE", VinkaItems.OAK_FENCE_GATE(), "swws",
+				new ItemStack[] { VinkaItems.STICK(), VinkaItems.OAK_SLAB() }, "s,w");
+		ItemModule.handRecipe("LADDER", VinkaItems.LADDER(), "xoxo", new ItemStack[] { VinkaItems.STICK() }, "x");
+		
 		ItemStack moreRedstoneTorches = VinkaItems.REDSTONE_TORCH();
 		moreRedstoneTorches.setAmount(2);
-
+		
 		ItemModule.handRecipe("REDSTONE_TORCH", moreRedstoneTorches, "coso",
-				new ItemStack[] { new ItemStack(Material.COAL), new ItemStack(Material.STICK) }, "c,s");
-
+				new ItemStack[] { VinkaItems.COAL(), VinkaItems.STICK() }, "c,s");
 		ItemModule.handRecipe("FISHING_ROD", VinkaItems.FISHING_ROD(), "ocso",
-				new ItemStack[] { new ItemStack(Material.STRING), new ItemStack(Material.STICK) }, "c,s");
+				new ItemStack[] { VinkaItems.STRING(), VinkaItems.STICK() }, "c,s");
 		ItemModule.handRecipe("OAK_PRESSURE_PLATE", VinkaItems.OAK_PRESSURE_PLATE(), "xoxo",
-				new ItemStack[] { new ItemStack(Material.OAK_SLAB) }, "x");
-		ItemModule.shapelessRecipe("STICK", VinkaItems.STICK(),
-				new ItemStack[] { new ItemStack(Material.RABBIT_FOOT), new ItemStack(Material.RABBIT_FOOT) });
-		ItemModule.shapelessRecipe("ITEM_FRAME", VinkaItems.ITEM_FRAME(), new ItemStack[] {
-				new ItemStack(Material.STICK), new ItemStack(Material.STICK), new ItemStack(Material.STICK) });
-		ItemModule.shapelessRecipe("OAK_STAIRS", VinkaItems.OAK_STAIRS(),
-				new ItemStack[] { new ItemStack(Material.OAK_PLANKS), new ItemStack(Material.OAK_PLANKS),
-						new ItemStack(Material.OAK_PLANKS) });
-		ItemModule.shapelessRecipe("OAK_BUTTON", VinkaItems.OAK_BUTTON(),
-				new ItemStack[] { new ItemStack(Material.OAK_PRESSURE_PLATE) });
-		ItemModule.shapelessRecipe("BOWL", VinkaItems.BOWL(), new ItemStack[] { new ItemStack(Material.RABBIT_FOOT),
-				new ItemStack(Material.RABBIT_FOOT), new ItemStack(Material.RABBIT_FOOT) });
+				new ItemStack[] { VinkaItems.OAK_SLAB() }, "x");
+		ItemModule.handRecipe("WHITE_BED", VinkaItems.WHITE_BED(), "wwxx",
+				new ItemStack[] { VinkaItems.WHITE_WOOL(), VinkaItems.OAK_SLAB() }, "w,x");
+		ItemModule.handRecipe("WHITE_BANNER", VinkaItems.WHITE_BANNER(), "woso",
+				new ItemStack[] { VinkaItems.WHITE_WOOL(), VinkaItems.STICK() }, "w,s");
+		ItemModule.handRecipe("COAL", VinkaItems.LIGHT_GRAY_DYE(), "xxxx", new ItemStack[] { VinkaItems.COAL() }, "x");
+		ItemModule.handRecipe("WOODEN_PICK", VinkaItems.WOODEN_PICKAXE(), "xxsx",
+				new ItemStack[] { VinkaItems.OAK_SLAB(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("WOODEN_SHOVEL", VinkaItems.WOODEN_SHOVEL(), "xoso",
+				new ItemStack[] { VinkaItems.OAK_SLAB(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("WOODEN_HOE", VinkaItems.WOODEN_HOE(), "xxso",
+				new ItemStack[] { VinkaItems.OAK_SLAB(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("WOODEN_AXE", VinkaItems.WOODEN_AXE(), "sxox",
+				new ItemStack[] { VinkaItems.OAK_SLAB(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("WOODEN_SWORD", VinkaItems.WOODEN_SWORD(), "oxsx",
+				new ItemStack[] { VinkaItems.OAK_SLAB(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("BOW", VinkaItems.BOW(), "sxsx",
+				new ItemStack[] { VinkaItems.STRING(), VinkaItems.STICK() }, "s,x");
+		ItemModule.handRecipe("ARROW", VinkaItems.ARROW(), "aobo",
+				new ItemStack[] { VinkaItems.RABBIT_FOOT(), VinkaItems.STICK() }, "a,b");
+		ItemModule.handRecipe("STONE_SLAB", VinkaItems.STONE_SLAB(), "xxxx", new ItemStack[] { VinkaItems.GRAY_DYE() },
+				"x");
+		ItemModule.handRecipe("STONE_BLOCK", VinkaItems.STONE_BLOCK(), "xxxx",
+				new ItemStack[] { VinkaItems.STONE_SLAB() }, "x");
+		ItemModule.handRecipe("BUCKET", VinkaItems.BUCKET(), "xoxo", new ItemStack[] { VinkaItems.STONE_SLAB() }, "x");
 
+		ItemModule.handRecipe("FURNACE", VinkaItems.FURNACE(), "xxxx", new ItemStack[] { VinkaItems.STONE_BLOCK() },
+				"x");
+		ItemModule.handRecipe("HOPPER", VinkaItems.HOPPER(), "aobo",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE(), VinkaItems.CHEST() }, "a,b");
+		ItemModule.handRecipe("STONE_PICK", VinkaItems.STONE_PICKAXE(), "xxsx",
+				new ItemStack[] { VinkaItems.STONE_SLAB(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("STONE_SHOVEL", VinkaItems.STONE_SHOVEL(), "xoso",
+				new ItemStack[] { VinkaItems.STONE_SLAB(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("STONE_HOE", VinkaItems.STONE_HOE(), "xxso",
+				new ItemStack[] { VinkaItems.STONE_SLAB(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("STONE_AXE", VinkaItems.STONE_AXE(), "sxox",
+				new ItemStack[] { VinkaItems.STONE_SLAB(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("STONE_SWORD", VinkaItems.STONE_SWORD(), "oxsx",
+				new ItemStack[] { VinkaItems.STONE_SLAB(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("TNT", VinkaItems.TNT(), "xxxx", new ItemStack[] { VinkaItems.SUGAR() }, "x");
+		ItemModule.handRecipe("LEVER", VinkaItems.LEVER(), "aobo",
+				new ItemStack[] { VinkaItems.STONE_SLAB(), VinkaItems.STICK() }, "a,b");
+		ItemModule.handRecipe("SHIELD", VinkaItems.SHIELD(), "aobo",
+				new ItemStack[] { VinkaItems.OAK_PLANKS(), VinkaItems.OAK_SLAB() }, "a,b");
+		ItemModule.handRecipe("IRON_TRAPDOOR", VinkaItems.IRON_TRAPDOOR(), "xxoo",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE() }, "x");
+		ItemModule.handRecipe("IRON_DOOR", VinkaItems.IRON_DOOR(), "xoxo",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE() }, "x");
+		ItemModule.handRecipe("IRON_BLOCK", VinkaItems.IRON_BLOCK(), "xxxx",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE() }, "x");
+		ItemModule.handRecipe("UNREFINED_GOLD", VinkaItems.GOLD_ORE(), "xxxx",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE() }, "x");
+		ItemModule.handRecipe("IRON_PICK", VinkaItems.IRON_PICKAXE(), "xxsx",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("IRON_SHOVEL", VinkaItems.IRON_SHOVEL(), "xoso",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("IRON_HOE", VinkaItems.IRON_HOE(), "xxso",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("IRON_AXE", VinkaItems.IRON_AXE(), "sxox",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("IRON_SWORD", VinkaItems.IRON_SWORD(), "oxsx",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("GOLD_PICK", VinkaItems.GOLD_PICKAXE(), "xxsx",
+				new ItemStack[] { VinkaItems.REFINED_GOLD_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("GOLD_SHOVEL", VinkaItems.GOLD_SHOVEL(), "xoso",
+				new ItemStack[] { VinkaItems.REFINED_GOLD_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("GOLD_HOE", VinkaItems.GOLD_HOE(), "xxso",
+				new ItemStack[] { VinkaItems.REFINED_GOLD_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("GOLD_AXE", VinkaItems.GOLD_AXE(), "sxox",
+				new ItemStack[] { VinkaItems.REFINED_GOLD_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("GOLD_SWORD", VinkaItems.GOLD_SWORD(), "oxsx",
+				new ItemStack[] { VinkaItems.REFINED_GOLD_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("DIAMOND_PICK", VinkaItems.DIAMOND_PICKAXE(), "xxsx",
+				new ItemStack[] { VinkaItems.REFINED_DIAMOND_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("DIAMOND_SHOVEL", VinkaItems.DIAMOND_SHOVEL(), "xoso",
+				new ItemStack[] { VinkaItems.REFINED_DIAMOND_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("DIAMOND_HOE", VinkaItems.DIAMOND_HOE(), "xxso",
+				new ItemStack[] { VinkaItems.REFINED_DIAMOND_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("DIAMOND_AXE", VinkaItems.DIAMOND_AXE(), "sxox",
+				new ItemStack[] { VinkaItems.REFINED_DIAMOND_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("DIAMOND_SWORD", VinkaItems.DIAMOND_SWORD(), "oxsx",
+				new ItemStack[] { VinkaItems.REFINED_DIAMOND_ORE(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("ENHANCED_PICK", VinkaItems.ENHANCED_PICKAXE(), "xxsx",
+				new ItemStack[] { VinkaItems.ENDER_PEARL(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("ENHANCED_SHOVEL", VinkaItems.ENHANCED_SHOVEL(), "xoso",
+				new ItemStack[] { VinkaItems.ENDER_PEARL(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("ENHANCED_HOE", VinkaItems.ENHANCED_HOE(), "xxso",
+				new ItemStack[] { VinkaItems.ENDER_PEARL(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("ENHANCED_AXE", VinkaItems.ENHANCED_AXE(), "sxox",
+				new ItemStack[] { VinkaItems.ENDER_PEARL(), VinkaItems.STICK() }, "x,s");
+		ItemModule.handRecipe("ENHANCED_SWORD", VinkaItems.ENHANCED_SWORD(), "oxsx",
+				new ItemStack[] { VinkaItems.ENDER_PEARL(), VinkaItems.STICK() }, "x,s");
+	}
+
+	private void addShapelessRecipes() {
+		ItemModule.shapelessRecipe("SEA_LANTERN", VinkaItems.SEA_LANTERN(),
+				new ItemStack[] { VinkaItems.GLOWSTONE_BLOCK() });
+		ItemModule.shapelessRecipe("OAK_SAPLING", VinkaItems.OAK_SAPLING(), new ItemStack[] { VinkaItems.SUGAR() });
+		ItemModule.shapelessRecipe("MULE_SPAWN_EGG", VinkaItems.MULE_SPAWN_EGG(),
+				new ItemStack[] { VinkaItems.LLAMA_SPAWN_EGG() });
+		ItemModule.shapelessRecipe("LLAMA_SPAWN_EGG", VinkaItems.LLAMA_SPAWN_EGG(),
+				new ItemStack[] { VinkaItems.DONKEY_SPAWN_EGG() });
+		ItemModule.shapelessRecipe("DONKEY_SPAWN_EGG", VinkaItems.DONKEY_SPAWN_EGG(),
+				new ItemStack[] { VinkaItems.HORSE_SPAWN_EGG() });
+		ItemModule.shapelessRecipe("STICK", VinkaItems.STICK(),
+				new ItemStack[] { VinkaItems.RABBIT_FOOT(), VinkaItems.RABBIT_FOOT() });
+		ItemModule.shapelessRecipe("ITEM_FRAME", VinkaItems.ITEM_FRAME(),
+				new ItemStack[] { VinkaItems.STICK(), VinkaItems.STICK(), VinkaItems.STICK() });
+		ItemModule.shapelessRecipe("OAK_STAIRS", VinkaItems.OAK_STAIRS(),
+				new ItemStack[] { VinkaItems.OAK_PLANKS(), VinkaItems.OAK_PLANKS(), VinkaItems.OAK_PLANKS() });
+		ItemModule.shapelessRecipe("OAK_BUTTON", VinkaItems.OAK_BUTTON(),
+				new ItemStack[] { VinkaItems.OAK_PRESSURE_PLATE() });
+		ItemModule.shapelessRecipe("BOWL", VinkaItems.BOWL(),
+				new ItemStack[] { VinkaItems.RABBIT_FOOT(), VinkaItems.RABBIT_FOOT(), VinkaItems.RABBIT_FOOT() });
 		ItemModule.shapelessRecipe("STRING", VinkaItems.STRING(), new ItemStack[] { new ItemStack(Material.INK_SAC),
 				new ItemStack(Material.INK_SAC), new ItemStack(Material.INK_SAC), new ItemStack(Material.INK_SAC) });
 		ItemModule.shapelessRecipe("WHITE_WOOL", VinkaItems.WHITE_WOOL(),
-				new ItemStack[] { new ItemStack(Material.STRING), new ItemStack(Material.STRING),
-						new ItemStack(Material.STRING), new ItemStack(Material.STRING) });
-		ItemModule.handRecipe("WHITE_BED", VinkaItems.WHITE_BED(), "wwxx",
-				new ItemStack[] { new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.OAK_SLAB) }, "w,x");
-		ItemModule.handRecipe("WHITE_BANNER", VinkaItems.WHITE_BANNER(), "woso",
-				new ItemStack[] { new ItemStack(Material.WHITE_WOOL), new ItemStack(Material.STICK) }, "w,s");
-
-		// Reverse Recipes
+				new ItemStack[] { VinkaItems.STRING(), VinkaItems.STRING(), VinkaItems.STRING(), VinkaItems.STRING() });
 		ItemModule.shapelessRecipe("OAK_SLAB_FROM_OAK_PLANKS", VinkaItems.OAK_SLAB(),
-				new ItemStack[] { new ItemStack(Material.OAK_PLANKS) });
+				new ItemStack[] { VinkaItems.OAK_PLANKS() });
 		ItemModule.shapelessRecipe("RABBIT_FOOT_FROM_OAK_SLAB", VinkaItems.RABBIT_FOOT(),
-				new ItemStack[] { new ItemStack(Material.OAK_SLAB) });
+				new ItemStack[] { VinkaItems.OAK_SLAB() });
 		ItemModule.shapelessRecipe("OAK_PLANKS_FROM_OAK_DOOR", VinkaItems.OAK_PLANKS(),
-				new ItemStack[] { new ItemStack(Material.OAK_DOOR) });
+				new ItemStack[] { VinkaItems.OAK_DOOR() });
 		ItemModule.shapelessRecipe("OAK_PLANKS_FROM_OAK_STAIRS", VinkaItems.OAK_PLANKS(),
-				new ItemStack[] { new ItemStack(Material.OAK_STAIRS) });
+				new ItemStack[] { VinkaItems.OAK_STAIRS() });
+		ItemModule.shapelessRecipe("STONE_BUTTON", VinkaItems.STONE_BUTTON(),
+				new ItemStack[] { VinkaItems.GRAY_DYE() });
+		ItemModule.shapelessRecipe("STONE_PRESSUREPLATE", VinkaItems.STONE_PRESSUREPLATE(),
+				new ItemStack[] { VinkaItems.STONE_SLAB() });
+		ItemModule.shapelessRecipe("CRAFTING_TABLE", VinkaItems.CRAFTING_TABLE(), new ItemStack[] {
+				VinkaItems.IRON_AXE(), VinkaItems.IRON_PICKAXE(), VinkaItems.IRON_HOE(), VinkaItems.IRON_SHOVEL() });
+	}
 
-		ItemModule.furnaceRecipe("MELON_SEEDS", VinkaItems.MELON_SEEDS(), Material.BEETROOT_SEEDS, 5);
+	private void addCraftingRecipes() {
+		ItemModule.craftedRecipe("DIAMOND_HORSE_ARMOR", VinkaItems.DIAMOND_HORSE_ARMOR(), "ooooooxxx",
+				new ItemStack[] { VinkaItems.REFINED_DIAMOND_ORE() }, "x");
+		ItemModule.craftedRecipe("GOLDEN_HORSE_ARMOR", VinkaItems.GOLD_HORSE_ARMOR(), "ooooooxxx",
+				new ItemStack[] { VinkaItems.REFINED_GOLD_ORE() }, "x");
+		ItemModule.craftedRecipe("IRON_HORSE_ARMOR", VinkaItems.IRON_HORSE_ARMOR(), "ooooooxxx",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE() }, "x");
+		ItemModule.craftedRecipe("WOLF_SPAWN_EGG", VinkaItems.WOLF_SPAWN_EGG(), "xxxxaxxxx",
+				new ItemStack[] { VinkaItems.SUGAR(), VinkaItems.BEETROOT_SEEDS() }, "x,a");
+		ItemModule.craftedRecipe("HORSE_SPAWN_EGG", VinkaItems.HORSE_SPAWN_EGG(), "xxxxaxxxx",
+				new ItemStack[] { VinkaItems.SUGAR(), VinkaItems.WHEAT_SEEDS() }, "x,a");
+		ItemModule.craftedRecipe("SHEEP_SPAWN_EGG", VinkaItems.SHEEP_SPAWN_EGG(), "xxxxaxxxx",
+				new ItemStack[] { VinkaItems.SUGAR(), VinkaItems.REFINED_IRON_ORE() }, "x,a");
+		ItemModule.craftedRecipe("VILLAGER_SPAWN_EGG", VinkaItems.VILLAGER_SPAWN_EGG(), "xxxxaxxxx",
+				new ItemStack[] { VinkaItems.SUGAR(), VinkaItems.REFINED_EMERALD() }, "x,a");
+		ItemModule.craftedRecipe("CHICKEN_SPAWN_EGG", VinkaItems.CHICKEN_SPAWN_EGG(), "xxxxaxxxx",
+				new ItemStack[] { VinkaItems.SUGAR(), VinkaItems.REFINED_DIAMOND_ORE() }, "x,a");
+		ItemModule.craftedRecipe("IRON_ORE_FROM_LIGHT_GRAY_DYE_ORE", VinkaItems.IRON_ORE(), "xxxxxxxxx",
+				new ItemStack[] { VinkaItems.LIGHT_GRAY_DYE() }, "x");
+		ItemModule.craftedRecipe("SADDLE", VinkaItems.SADDLE(), "xoxxaxxxx",
+				new ItemStack[] { VinkaItems.WHEAT_SEEDS(), VinkaItems.REFINED_IRON_ORE() }, "x,a");
 		ItemModule.craftedRecipe("SEEDS", VinkaItems.WHEAT_SEEDS(), "xxxxxxxxx",
-				new ItemStack[] { new ItemStack(Material.MELON_SEEDS) }, "x");
-
-		ItemModule.handRecipe("COAL", VinkaItems.LIGHT_GRAY_DYE(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.COAL) }, "x");
-
-		// Tools
-		ItemModule.handRecipe("WOODEN_PICK", VinkaItems.WOODEN_PICKAXE(), "xxsx",
-				new ItemStack[] { new ItemStack(Material.OAK_SLAB), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("WOODEN_SHOVEL", VinkaItems.WOODEN_SHOVEL(), "xoso",
-				new ItemStack[] { new ItemStack(Material.OAK_SLAB), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("WOODEN_HOE", VinkaItems.WOODEN_HOE(), "xxso",
-				new ItemStack[] { new ItemStack(Material.OAK_SLAB), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("WOODEN_AXE", VinkaItems.WOODEN_AXE(), "sxox",
-				new ItemStack[] { new ItemStack(Material.OAK_SLAB), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("WOODEN_SWORD", VinkaItems.WOODEN_SWORD(), "oxsx",
-				new ItemStack[] { new ItemStack(Material.OAK_SLAB), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("BOW", VinkaItems.BOW(), "sxsx",
-				new ItemStack[] { new ItemStack(Material.STRING), new ItemStack(Material.STICK) }, "s,x");
-		ItemModule.handRecipe("ARROW", VinkaItems.ARROW(), "aobo",
-				new ItemStack[] { new ItemStack(Material.RABBIT_FOOT), new ItemStack(Material.STICK) }, "a,b");
-
+				new ItemStack[] { VinkaItems.MELON_SEEDS() }, "x");
 		ItemModule.craftedRecipe("DIRT_BLOCK", VinkaItems.DIRT_BLOCK(), "xxxxxxxxx",
-				new ItemStack[] { new ItemStack(Material.DRIED_KELP) }, "x");
+				new ItemStack[] { VinkaItems.DRIED_KELP() }, "x");
+		ItemModule.craftedRecipe("RAILS", VinkaItems.RAILS(), "oooabaooo",
+				new ItemStack[] { VinkaItems.STONE_SLAB(), VinkaItems.STICK() }, "a,b");
+		ItemModule.craftedRecipe("POWERED_RAILS", VinkaItems.POWERED_RAILS(), "aoaabaooo",
+				new ItemStack[] { VinkaItems.STONE_SLAB(), VinkaItems.STICK() }, "a,b");
+		ItemModule.craftedRecipe("DETECTOR_RAILS", VinkaItems.DETECTOR_RAILS(), "oooabaaoa",
+				new ItemStack[] { VinkaItems.STONE_SLAB(), VinkaItems.STICK() }, "a,b");
+		ItemModule.craftedRecipe("ACTIVATOR_RAILS", VinkaItems.ACTIVATOR_RAILS(), "aoaabaaoa",
+				new ItemStack[] { VinkaItems.STONE_SLAB(), VinkaItems.STICK() }, "a,b");
+		ItemModule.craftedRecipe("MINECART", VinkaItems.MINECART(), "oooaoaaaa",
+				new ItemStack[] { VinkaItems.STONE_SLAB() }, "a");
+		ItemModule.craftedRecipe("CARVED_PUMPKIN", VinkaItems.CARVED_PUMPKIN(), "xxxxxxxxx",
+				new ItemStack[] { VinkaItems.WHEAT_SEEDS() }, "x");
+		ItemModule.craftedRecipe("WOOD_BOOTS", VinkaItems.LEATHER_BOOTS(), "ooooooxox",
+				new ItemStack[] { VinkaItems.OAK_PLANKS() }, "x");
+		ItemModule.craftedRecipe("WOOD_LEGGINGS", VinkaItems.LEATHER_LEGGINGS(), "oooxoxxox",
+				new ItemStack[] { VinkaItems.OAK_PLANKS() }, "x");
+		ItemModule.craftedRecipe("WOOD_CHESTPLATE", VinkaItems.LEATHER_CHESTPLATE(), "oooxxxxxx",
+				new ItemStack[] { VinkaItems.OAK_PLANKS() }, "x");
+		ItemModule.craftedRecipe("WOOD_HELMET", VinkaItems.LEATHER_HELMET(), "xxxoooooo",
+				new ItemStack[] { VinkaItems.OAK_PLANKS() }, "x");
+		ItemModule.craftedRecipe("IRON_BOOTS", VinkaItems.IRON_BOOTS(), "ooooooxox",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE() }, "x");
+		ItemModule.craftedRecipe("IRON_LEGGINGS", VinkaItems.IRON_LEGGINGS(), "oooxoxxox",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE() }, "x");
+		ItemModule.craftedRecipe("IRON_CHESTPLATE", VinkaItems.IRON_CHESTPLATE(), "oooxxxxxx",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE() }, "x");
+		ItemModule.craftedRecipe("IRON_HELMET", VinkaItems.IRON_HELMET(), "xxxoooooo",
+				new ItemStack[] { VinkaItems.REFINED_IRON_ORE() }, "x");
+		ItemModule.craftedRecipe("GOLDEN_BOOTS", VinkaItems.GOLDEN_BOOTS(), "ooooooxox",
+				new ItemStack[] { VinkaItems.REFINED_GOLD_ORE() }, "x");
+		ItemModule.craftedRecipe("GOLDEN_LEGGINGS", VinkaItems.GOLDEN_LEGGINGS(), "oooxoxxox",
+				new ItemStack[] { VinkaItems.REFINED_GOLD_ORE() }, "x");
+		ItemModule.craftedRecipe("GOLDEN_CHESTPLATE", VinkaItems.GOLDEN_CHESTPLATE(), "oooxxxxxx",
+				new ItemStack[] { VinkaItems.REFINED_GOLD_ORE() }, "x");
+		ItemModule.craftedRecipe("GOLDEN_HELMET", VinkaItems.GOLDEN_HELMET(), "xxxoooooo",
+				new ItemStack[] { VinkaItems.REFINED_GOLD_ORE() }, "x");
+		ItemModule.craftedRecipe("DIAMOND_BOOTS", VinkaItems.DIAMOND_BOOTS(), "ooooooxox",
+				new ItemStack[] { VinkaItems.REFINED_DIAMOND_ORE() }, "x");
+		ItemModule.craftedRecipe("DIAMOND_LEGGINGS", VinkaItems.DIAMOND_LEGGINGS(), "oooxoxxox",
+				new ItemStack[] { VinkaItems.REFINED_DIAMOND_ORE() }, "x");
+		ItemModule.craftedRecipe("DIAMOND_CHESTPLATE", VinkaItems.DIAMOND_CHESTPLATE(), "oooxxxxxx",
+				new ItemStack[] { VinkaItems.REFINED_DIAMOND_ORE() }, "x");
+		ItemModule.craftedRecipe("DIAMOND_HELMET", VinkaItems.DIAMOND_HELMET(), "xxxoooooo",
+				new ItemStack[] { VinkaItems.REFINED_DIAMOND_ORE() }, "x");
+		ItemModule.craftedRecipe("ENHANCED_BOOTS", VinkaItems.ENHANCED_BOOTS(), "ooooooxox",
+				new ItemStack[] { VinkaItems.ENDER_PEARL() }, "x");
+		ItemModule.craftedRecipe("ENHANCED_LEGGINGS", VinkaItems.ENHANCED_LEGGINGS(), "oooxoxxox",
+				new ItemStack[] { VinkaItems.ENDER_PEARL() }, "x");
+		ItemModule.craftedRecipe("ENHANCED_CHESTPLATE", VinkaItems.ENHANCED_CHESTPLATE(), "oooxxxxxx",
+				new ItemStack[] { VinkaItems.ENDER_PEARL() }, "x");
+		ItemModule.craftedRecipe("ENHANCED_HELMET", VinkaItems.ENHANCED_HELMET(), "xxxoooooo",
+				new ItemStack[] { VinkaItems.ENDER_PEARL() }, "x");
+	}
 
-		// Stone Age
-		ItemModule.handRecipe("STONE_SLAB", VinkaItems.STONE_SLAB(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.GRAY_DYE) }, "x");
-		ItemModule.handRecipe("STONE_BLOCK", VinkaItems.STONE_BLOCK(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB) }, "x");
-
-		ItemModule.handRecipe("BUCKET", VinkaItems.BUCKET(), "xoxo",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB) }, "x");
-
-		ItemModule.handRecipe("FURNACE", VinkaItems.FURNACE(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.STONE) }, "x");
-		ItemModule.handRecipe("HOPPER", VinkaItems.HOPPER(), "aobo",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT), new ItemStack(Material.CHEST) }, "a,b");
-
-		// Furnace Recipes
+	private void addFurnaceRecipes() {
+		ItemModule.furnaceRecipe("MELON_SEEDS", VinkaItems.MELON_SEEDS(), Material.BEETROOT_SEEDS, 5);
 		ItemModule.furnaceRecipe("REFINED_IRON_ORE", VinkaItems.REFINED_IRON_ORE(), Material.LIGHT_GRAY_DYE, 5);
 		ItemModule.furnaceRecipe("REFINED_GOLD_ORE", VinkaItems.REFINED_GOLD_ORE(), Material.DANDELION_YELLOW, 30);
 		ItemModule.furnaceRecipe("REFINED_DIAMOND_ORE", VinkaItems.REFINED_DIAMOND_ORE(), Material.LIGHT_BLUE_DYE, 60);
 		ItemModule.furnaceRecipe("REFINED_EMERALD", VinkaItems.REFINED_EMERALD(), Material.LIME_DYE, 60);
+	}
 
-		// Tools
-		ItemModule.handRecipe("STONE_PICK", VinkaItems.STONE_PICKAXE(), "xxsx",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("STONE_SHOVEL", VinkaItems.STONE_SHOVEL(), "xoso",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("STONE_HOE", VinkaItems.STONE_HOE(), "xxso",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("STONE_AXE", VinkaItems.STONE_AXE(), "sxox",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("STONE_SWORD", VinkaItems.STONE_SWORD(), "oxsx",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB), new ItemStack(Material.STICK) }, "x,s");
-
-		ItemModule.handRecipe("TNT", VinkaItems.TNT(), "xxxx", new ItemStack[] { new ItemStack(Material.SUGAR) }, "x");
-
-		ItemModule.craftedRecipe("RAILS", VinkaItems.RAILS(), "oooabaooo",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB), new ItemStack(Material.STICK) }, "a,b");
-		ItemModule.craftedRecipe("POWERED_RAILS", VinkaItems.POWERED_RAILS(), "aoaabaooo",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB), new ItemStack(Material.STICK) }, "a,b");
-		ItemModule.craftedRecipe("DETECTOR_RAILS", VinkaItems.DETECTOR_RAILS(), "oooabaaoa",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB), new ItemStack(Material.STICK) }, "a,b");
-		ItemModule.craftedRecipe("ACTIVATOR_RAILS", VinkaItems.ACTIVATOR_RAILS(), "aoaabaaoa",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB), new ItemStack(Material.STICK) }, "a,b");
-
-		ItemModule.craftedRecipe("MINECART", VinkaItems.MINECART(), "oooaoaaaa",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB) }, "a");
-
-		ItemModule.craftedRecipe("CARVED_PUMPKIN", VinkaItems.CARVED_PUMPKIN(), "xxxxxxxxx",
-				new ItemStack[] { new ItemStack(Material.WHEAT_SEEDS) }, "x");
-
-		ItemModule.handRecipe("LEVER", VinkaItems.LEVER(), "aobo",
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB), new ItemStack(Material.STICK) }, "a,b");
-
-		ItemModule.handRecipe("SHIELD", VinkaItems.SHIELD(), "aobo",
-				new ItemStack[] { new ItemStack(Material.OAK_PLANKS), new ItemStack(Material.OAK_SLAB) }, "a,b");
-
-		ItemModule.handRecipe("IRON_TRAPDOOR", VinkaItems.IRON_TRAPDOOR(), "xxoo",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT) }, "x");
-		ItemModule.handRecipe("IRON_DOOR", VinkaItems.IRON_DOOR(), "xoxo",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT) }, "x");
-		ItemModule.shapelessRecipe("STONE_BUTTON", VinkaItems.STONE_BUTTON(),
-				new ItemStack[] { new ItemStack(Material.GRAY_DYE) });
-		ItemModule.shapelessRecipe("STONE_PRESSUREPLATE", VinkaItems.STONE_PRESSUREPLATE(),
-				new ItemStack[] { new ItemStack(Material.STONE_SLAB) });
-
-		ItemModule.craftedRecipe("WOOD_BOOTS", VinkaItems.LEATHER_BOOTS(), "ooooooxox",
-				new ItemStack[] { new ItemStack(Material.OAK_PLANKS) }, "x");
-		ItemModule.craftedRecipe("WOOD_LEGGINGS", VinkaItems.LEATHER_LEGGINGS(), "oooxoxxox",
-				new ItemStack[] { new ItemStack(Material.OAK_PLANKS) }, "x");
-		ItemModule.craftedRecipe("WOOD_CHESTPLATE", VinkaItems.LEATHER_CHESTPLATE(), "oooxxxxxx",
-				new ItemStack[] { new ItemStack(Material.OAK_PLANKS) }, "x");
-		ItemModule.craftedRecipe("WOOD_HELMET", VinkaItems.LEATHER_HELMET(), "xxxoooooo",
-				new ItemStack[] { new ItemStack(Material.OAK_PLANKS) }, "x");
-
-		ItemModule.craftedRecipe("IRON_BOOTS", VinkaItems.IRON_BOOTS(), "ooooooxox",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT) }, "x");
-		ItemModule.craftedRecipe("IRON_LEGGINGS", VinkaItems.IRON_LEGGINGS(), "oooxoxxox",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT) }, "x");
-		ItemModule.craftedRecipe("IRON_CHESTPLATE", VinkaItems.IRON_CHESTPLATE(), "oooxxxxxx",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT) }, "x");
-		ItemModule.craftedRecipe("IRON_HELMET", VinkaItems.IRON_HELMET(), "xxxoooooo",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT) }, "x");
-
-		ItemModule.craftedRecipe("GOLDEN_BOOTS", VinkaItems.GOLDEN_BOOTS(), "ooooooxox",
-				new ItemStack[] { new ItemStack(Material.GOLD_INGOT) }, "x");
-		ItemModule.craftedRecipe("GOLDEN_LEGGINGS", VinkaItems.GOLDEN_LEGGINGS(), "oooxoxxox",
-				new ItemStack[] { new ItemStack(Material.GOLD_INGOT) }, "x");
-		ItemModule.craftedRecipe("GOLDEN_CHESTPLATE", VinkaItems.GOLDEN_CHESTPLATE(), "oooxxxxxx",
-				new ItemStack[] { new ItemStack(Material.GOLD_INGOT) }, "x");
-		ItemModule.craftedRecipe("GOLDEN_HELMET", VinkaItems.GOLDEN_HELMET(), "xxxoooooo",
-				new ItemStack[] { new ItemStack(Material.GOLD_INGOT) }, "x");
-
-		ItemModule.craftedRecipe("DIAMOND_BOOTS", VinkaItems.DIAMOND_BOOTS(), "ooooooxox",
-				new ItemStack[] { new ItemStack(Material.DIAMOND) }, "x");
-		ItemModule.craftedRecipe("DIAMOND_LEGGINGS", VinkaItems.DIAMOND_LEGGINGS(), "oooxoxxox",
-				new ItemStack[] { new ItemStack(Material.DIAMOND) }, "x");
-		ItemModule.craftedRecipe("DIAMOND_CHESTPLATE", VinkaItems.DIAMOND_CHESTPLATE(), "oooxxxxxx",
-				new ItemStack[] { new ItemStack(Material.DIAMOND) }, "x");
-		ItemModule.craftedRecipe("DIAMOND_HELMET", VinkaItems.DIAMOND_HELMET(), "xxxoooooo",
-				new ItemStack[] { new ItemStack(Material.DIAMOND) }, "x");
-		
-		ItemModule.craftedRecipe("ENHANCED_BOOTS", VinkaItems.ENHANCED_BOOTS(), "ooooooxox",
-				new ItemStack[] { new ItemStack(Material.ENDER_PEARL) }, "x");
-		ItemModule.craftedRecipe("ENHANCED_LEGGINGS", VinkaItems.ENHANCED_LEGGINGS(), "oooxoxxox",
-				new ItemStack[] { new ItemStack(Material.ENDER_PEARL) }, "x");
-		ItemModule.craftedRecipe("ENHANCED_CHESTPLATE", VinkaItems.ENHANCED_CHESTPLATE(), "oooxxxxxx",
-				new ItemStack[] { new ItemStack(Material.ENDER_PEARL) }, "x");
-		ItemModule.craftedRecipe("ENHANCED_HELMET", VinkaItems.ENHANCED_HELMET(), "xxxoooooo",
-				new ItemStack[] { new ItemStack(Material.ENDER_PEARL) }, "x");
-
-		// Iron Age
-		ItemModule.handRecipe("IRON_BLOCK", VinkaItems.IRON_BLOCK(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT) }, "x");
-
-		ItemModule.shapelessRecipe("CRAFTING_TABLE", VinkaItems.CRAFTING_TABLE(),
-				new ItemStack[] { new ItemStack(Material.IRON_AXE), new ItemStack(Material.IRON_PICKAXE),
-						new ItemStack(Material.IRON_HOE), new ItemStack(Material.IRON_SHOVEL) });
-
-		ItemModule.handRecipe("UNREFINED_GOLD", VinkaItems.GOLD_ORE(), "xxxx",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT) }, "x");
-
-		// Tools
-		ItemModule.handRecipe("IRON_PICK", VinkaItems.IRON_PICKAXE(), "xxsx",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("IRON_SHOVEL", VinkaItems.IRON_SHOVEL(), "xoso",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("IRON_HOE", VinkaItems.IRON_HOE(), "xxso",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("IRON_AXE", VinkaItems.IRON_AXE(), "sxox",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("IRON_SWORD", VinkaItems.IRON_SWORD(), "oxsx",
-				new ItemStack[] { new ItemStack(Material.IRON_INGOT), new ItemStack(Material.STICK) }, "x,s");
-
-		// Gold Age
-
-		// Tools
-		ItemModule.handRecipe("GOLD_PICK", VinkaItems.GOLD_PICKAXE(), "xxsx",
-				new ItemStack[] { new ItemStack(Material.GOLD_INGOT), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("GOLD_SHOVEL", VinkaItems.GOLD_SHOVEL(), "xoso",
-				new ItemStack[] { new ItemStack(Material.GOLD_INGOT), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("GOLD_HOE", VinkaItems.GOLD_HOE(), "xxso",
-				new ItemStack[] { new ItemStack(Material.GOLD_INGOT), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("GOLD_AXE", VinkaItems.GOLD_AXE(), "sxox",
-				new ItemStack[] { new ItemStack(Material.GOLD_INGOT), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("GOLD_SWORD", VinkaItems.GOLD_SWORD(), "oxsx",
-				new ItemStack[] { new ItemStack(Material.GOLD_INGOT), new ItemStack(Material.STICK) }, "x,s");
-
-		// Diamond Age
-
-		// Tools
-		ItemModule.handRecipe("DIAMOND_PICK", VinkaItems.DIAMOND_PICKAXE(), "xxsx",
-				new ItemStack[] { new ItemStack(Material.DIAMOND), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("DIAMOND_SHOVEL", VinkaItems.DIAMOND_SHOVEL(), "xoso",
-				new ItemStack[] { new ItemStack(Material.DIAMOND), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("DIAMOND_HOE", VinkaItems.DIAMOND_HOE(), "xxso",
-				new ItemStack[] { new ItemStack(Material.DIAMOND), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("DIAMOND_AXE", VinkaItems.DIAMOND_AXE(), "sxox",
-				new ItemStack[] { new ItemStack(Material.DIAMOND), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("DIAMOND_SWORD", VinkaItems.DIAMOND_SWORD(), "oxsx",
-				new ItemStack[] { new ItemStack(Material.DIAMOND), new ItemStack(Material.STICK) }, "x,s");
-		
-		ItemModule.handRecipe("ENHANCED_PICK", VinkaItems.ENHANCED_PICKAXE(), "xxsx",
-				new ItemStack[] { new ItemStack(Material.ENDER_PEARL), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("ENHANCED_SHOVEL", VinkaItems.ENHANCED_SHOVEL(), "xoso",
-				new ItemStack[] { new ItemStack(Material.ENDER_PEARL), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("ENHANCED_HOE", VinkaItems.ENHANCED_HOE(), "xxso",
-				new ItemStack[] { new ItemStack(Material.ENDER_PEARL), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("ENHANCED_AXE", VinkaItems.ENHANCED_AXE(), "sxox",
-				new ItemStack[] { new ItemStack(Material.ENDER_PEARL), new ItemStack(Material.STICK) }, "x,s");
-		ItemModule.handRecipe("ENHANCED_SWORD", VinkaItems.ENHANCED_SWORD(), "oxsx",
-				new ItemStack[] { new ItemStack(Material.ENDER_PEARL), new ItemStack(Material.STICK) }, "x,s");
+	private void addRecipes() {
+		addHandRecipes();
+		addShapelessRecipes();
+		addFurnaceRecipes();
+		addCraftingRecipes();
 	}
 }

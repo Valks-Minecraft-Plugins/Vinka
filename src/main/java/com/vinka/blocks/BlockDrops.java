@@ -112,6 +112,7 @@ public class BlockDrops {
 			w.dropItemNaturally(loc, VinkaItems.GRAY_DYE());
 			break;
 		case STONE:
+		case GRAY_CONCRETE:
 			ItemStack item3 = VinkaItems.GRAY_DYE();
 			item3.setAmount(amount);
 			w.dropItemNaturally(loc, item3);

@@ -28,6 +28,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.VillagerAcquireTradeEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -84,14 +85,35 @@ public class MobInteract implements Listener {
 			}
 		}.runTaskLater(Vinka.vinka, 60);
 	}
+	
+	@EventHandler
+	private void inventoryCloseEvent(InventoryCloseEvent e) {
+		if (e.getView().getTitle().toLowerCase().equals("loot")) {
+			for (ItemStack item : e.getInventory().getContents()) {
+				if (item != null) {
+					if (item.getType() != Material.AIR) {
+						Player p = (Player) e.getPlayer();
+						p.getWorld().dropItemNaturally(p.getLocation(), item);
+					}
+				}
+			}
+		}
+	}
 
 	@EventHandler
 	private void playerInteractAtEntity(PlayerInteractAtEntityEvent e) {
 		if (e.getHand() != EquipmentSlot.HAND)
 			return;
-		if (e.getRightClicked().getType() != EntityType.ARMOR_STAND)
+		Entity entity = e.getRightClicked();
+		if (entity == null)
 			return;
-		if (!e.getRightClicked().getMetadata("Type").get(0).asString().equals("Lootable"))
+		if (entity.getType() != EntityType.ARMOR_STAND)
+			return;
+		if (entity.getMetadata("Type") == null)
+			return;
+		if (entity.getMetadata("Type").get(0) == null)
+			return;
+		if (!entity.getMetadata("Type").get(0).asString().equals("Lootable"))
 			return;
 		
 		e.setCancelled(true);
@@ -99,7 +121,7 @@ public class MobInteract implements Listener {
 
 		int size = 9;
 
-		Inventory inv = Bukkit.createInventory(null, 9, "");
+		Inventory inv = Bukkit.createInventory(null, 9, "Loot");
 
 		inv.setItem(new Random().nextInt(size), VinkaItems.REDSTONE());
 		if (Math.random() < 0.35)
