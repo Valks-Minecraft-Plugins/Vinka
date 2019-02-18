@@ -9,8 +9,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.valkcore.color.Color;
 import com.valkutils.modules.BlockModule;
-import com.valkutils.modules.TextModule;
 import com.vinka.Vinka;
 import com.vinkaitems.VinkaItems;
 
@@ -20,6 +20,11 @@ public class BlockDrops {
 		World w = loc.getWorld();
 
 		switch (e.getBlock().getType()) {
+		case SOUL_SAND:
+			ItemStack sugar = VinkaItems.SUGAR();
+			sugar.setAmount(9);
+			w.dropItemNaturally(loc, sugar);
+			break;
 		case REDSTONE_ORE:
 			ItemStack redstone_ore = VinkaItems.ROSE_RED_DYE();
 			redstone_ore.setAmount(amount);
@@ -54,7 +59,7 @@ public class BlockDrops {
 			ItemStack item5 = VinkaItems.GOLD_ORE();
 			item5.setAmount(amount);
 			e.getPlayer().getInventory().addItem(item5);
-			e.getPlayer().sendMessage(TextModule.color("&7Some &flimonite ore &7was added to your inventory."));
+			e.getPlayer().sendMessage(Color.convertToColor("Some &qlimonite ore &wwas added to your inventory."));
 			e.getBlock().setType(Material.LAVA);
 			break;
 		case EMERALD_ORE:
@@ -163,10 +168,31 @@ public class BlockDrops {
 				w.dropItemNaturally(loc, VinkaItems.WHEAT_SEEDS());
 			}
 			break;
+		case CARROTS:
+			Ageable crop4 = (Ageable) e.getBlock().getBlockData();
+			if (crop4.getAge() == 7) {
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						e.getBlock().setType(Material.CARROTS);
+					}
+				}.runTaskLater(Vinka.vinka, 20);
+				
+				ItemStack item1 = VinkaItems.STRING();
+				item1.setAmount(amount);
+				w.dropItemNaturally(loc, item1);
+			} else {
+				w.dropItemNaturally(loc, VinkaItems.CARROT());
+			}
+			break;
 		default:
 			if (BlockModule.isPlant(e.getBlock().getType())) {
 				if (Math.random() < 0.3) {
-					w.dropItemNaturally(loc, VinkaItems.BEETROOT_SEEDS());
+					if (Math.random() < 0.5) {
+						w.dropItemNaturally(loc, VinkaItems.BEETROOT_SEEDS());
+					} else {
+						w.dropItemNaturally(loc, VinkaItems.CARROT());
+					}
 				}
 			}
 

@@ -2,32 +2,37 @@ package com.vinka.utils;
 
 import java.util.Random;
 
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Husk;
 import org.bukkit.entity.Zombie;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.Phantom;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
+import org.bukkit.entity.Slime;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.EulerAngle;
+import org.bukkit.util.Vector;
 
+import com.valkcore.color.Color;
 import com.valkutils.modules.BlockModule;
 import com.valkutils.modules.PlayerModule;
-import com.valkutils.modules.TextModule;
 import com.vinka.Vinka;
 import com.vinkaitems.VinkaItems;
 
@@ -38,6 +43,9 @@ public class Utils {
 		equip.setHelmet(new ItemStack(Material.BLACK_WOOL));
 
 		switch (type) {
+		case SLIME:
+			((Slime) monster).setSize(2 + new Random().nextInt(2));
+			break;
 		case ZOMBIE:
 			((Zombie) monster).setBaby(false);
 			break;
@@ -68,6 +76,69 @@ public class Utils {
 		}
 
 		removeMonsterLater(monster);
+	}
+	
+	public static void removeMonsterLater(LivingEntity entity) {
+		if (entity instanceof Slime || entity instanceof Ghast || entity instanceof Phantom) {
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					entity.remove();
+				}
+			}.runTaskLater(Vinka.vinka, 20 * 30);
+		} else {
+			BukkitTask effects = new BukkitRunnable() {
+				int ticksLived = 0;
+				
+				@Override
+				public void run() {
+			    	if (entity.getHealth() <= 0 || ticksLived == entity.getTicksLived()) {
+			    		cancel();
+			    	}
+			    	ticksLived = entity.getTicksLived();
+			    	
+			    	entity.getWorld().spawnParticle(Particle.VILLAGER_HAPPY, entity.getEyeLocation(), 3, 0.3, 0.5, 0.3);
+				}
+			}.runTaskTimer(Vinka.vinka, 5, 5);
+			
+			BukkitTask ai = new BukkitRunnable() {
+				int ticksLived = 0;
+				
+				@Override
+				public void run() {
+					Monster monster = (Monster) entity;
+					
+					if (monster.getHealth() <= 0 || ticksLived == monster.getTicksLived()) {
+			    		cancel();
+			    	}
+			    	ticksLived = monster.getTicksLived();
+			    	
+			    	if (monster.getTarget() != null) {
+			    		if (monster.getTarget() instanceof Player) {
+			    			Block[] blocks = BlockModule.getAdjacentBlocks(monster.getLocation().getBlock());
+			    			
+			    			for (Block block : blocks) {
+			    				if (block.getType() != Material.AIR) {
+									Vector eyeDirection = monster.getEyeLocation().getDirection().multiply(0.1);
+									Vector upwardsForce = new Vector(0, 0.7, 0);
+									Vector force = eyeDirection.add(upwardsForce);
+									monster.setVelocity(force);
+			    				}
+			    			}
+			    		}
+			    	}
+				}
+			}.runTaskTimer(Vinka.vinka, 100, 100);
+			
+			new BukkitRunnable() {
+				@Override
+				public void run() {
+					effects.cancel();
+					ai.cancel();
+					entity.remove();
+				}
+			}.runTaskLater(Vinka.vinka, 600);
+		}
 	}
 
 	public static void spawnParticles(Location loc, Particle type, int amount) {
@@ -114,7 +185,7 @@ public class Utils {
 				ItemStack sticks = VinkaItems.STICK();
 				sticks.setAmount(2);
 				p.getEquipment().setItemInMainHand(sticks);
-				p.sendMessage(TextModule.color("&7Your tool snapped in two."));
+				p.sendMessage(Color.convertToColor("Your tool snapped in two."));
 			}
 		}
 	}
@@ -190,15 +261,6 @@ public class Utils {
 		removeMonsterLater(monster);
 	}
 
-	public static void removeMonsterLater(final LivingEntity monster) {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				monster.remove();
-			}
-		}.runTaskLater(Vinka.vinka, 600);
-	}
-
 	public static boolean validSpawningLocation(Location testLoc) {
 		if (testLoc.getBlock().getType() == Material.AIR
 				&& testLoc.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR) {
@@ -208,7 +270,7 @@ public class Utils {
 		}
 		return false;
 	}
-
+	
 	public static Location[] testLocations(Location loc, int radius) {
 		World w = loc.getWorld();
 		return new Location[] { new Location(w, loc.getX() + radius, loc.getY(), loc.getZ()),
@@ -218,6 +280,7 @@ public class Utils {
 	}
 
 	public static void spawnCorpse(final Location loc, final LivingEntity entity, final boolean onlyHead) {
+		if (entity.getType() == EntityType.PLAYER) return;
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -230,7 +293,6 @@ public class Utils {
 				as.setCollidable(false);
 				as.setBasePlate(false);
 				as.setArms(false);
-				as.setMetadata("Type", new FixedMetadataValue(Vinka.vinka, "Lootable"));
 
 				int rotation = new Random().nextInt(360);
 
@@ -242,7 +304,7 @@ public class Utils {
 				if (!onlyHead) {
 					ItemStack leather_plate = new ItemStack(Material.LEATHER_CHESTPLATE);
 					LeatherArmorMeta im = (LeatherArmorMeta) leather_plate.getItemMeta();
-					im.setColor(Color.BLACK);
+					im.setColor(org.bukkit.Color.BLACK);
 					leather_plate.setItemMeta(im);
 
 					as.setChestplate(leather_plate);
@@ -277,6 +339,13 @@ public class Utils {
 					as.setHelmet(new ItemStack(Material.BLACK_WOOL));
 					break;
 				}
+				
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						as.remove();
+					}
+				}.runTaskLater(Vinka.vinka, 20 * 180);
 			}
 		}.runTaskLater(Vinka.vinka, 20); // Spawn in a second later or will not spawn in at all.
 	}

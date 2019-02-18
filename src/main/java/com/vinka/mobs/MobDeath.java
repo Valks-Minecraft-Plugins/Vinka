@@ -1,9 +1,11 @@
 package com.vinka.mobs;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -21,15 +23,28 @@ import com.vinkaitems.VinkaItems;
 public class MobDeath implements Listener {
 	@EventHandler
 	private void entitySplitEvent(SlimeSplitEvent e) {
-		e.setCancelled(true);
+		if (WorldModule.day()) {
+			e.setCancelled(true);
+		}
 	}
 
 	@EventHandler
 	private void entityDeathEvent(EntityDeathEvent e) {
 		Entity entity = e.getEntity();
+		
+		if (entity.getType() == EntityType.OCELOT || entity.getType() == EntityType.PLAYER || entity.getType() == EntityType.CHICKEN || entity.getType() == EntityType.SHEEP) {
+			return;
+		}
+		
 		Location entityLocation = entity.getLocation();
 		World w = entityLocation.getWorld();
 		Location loc = w.getHighestBlockAt(entityLocation).getLocation();
+		
+		if (Math.random() < 0.33) {
+			if (loc.getBlock().getRelative(BlockFace.DOWN).getType() == Material.GRASS_BLOCK && loc.getBlock().getType() == Material.AIR) {
+				loc.getBlock().setType(Material.OAK_SAPLING);
+			}
+		}
 
 		w.playSound(loc, Sound.AMBIENT_CAVE, 1f, 1f);
 

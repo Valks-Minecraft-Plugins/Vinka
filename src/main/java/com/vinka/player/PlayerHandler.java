@@ -25,6 +25,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
@@ -52,6 +53,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
+import com.valkcore.color.Color;
 import com.valkutils.ValkUtils;
 import com.valkutils.modules.BlockModule;
 import com.valkutils.modules.PlayerModule;
@@ -98,23 +100,27 @@ public class PlayerHandler implements Listener {
 			e.setCancelled(true);
 			Location loc = e.getPlayer().getLocation();
 			loc.getWorld().dropItemNaturally(loc, VinkaItems.RAW_SALMON());
-			e.getPlayer().sendMessage(TextModule.color("&7A salmon has given you its soul.. enjoy.."));
+			e.getPlayer().sendMessage(Color.convertToColor("A salmon has given you its soul.. enjoy.."));
+		}
+	}
+	
+	@EventHandler
+	private void playerDmg(EntityDamageEvent e) {
+		if (e.getEntity() instanceof Player) {
+			if (e.getCause() == DamageCause.FALL) {
+				e.setCancelled(true);
+			}
 		}
 	}
 
 	@EventHandler
-	private void playerDamage(EntityDamageEvent e) {
+	private void playerDamage(EntityDamageByEntityEvent e) {
 		if (e.getEntity() instanceof Player) {
 			Player p = (Player) e.getEntity();
 			
-			if (e.getCause() == DamageCause.FALL) {
-				e.setCancelled(true);
-				return;
-			}
-			
 			if ((p.getHealth() - e.getDamage()) <= 0) { // Player died.
 				e.setCancelled(true);
-				Bukkit.getPluginManager().callEvent(new CustomPlayerDeathEvent(p, e.getCause()));
+				Bukkit.getPluginManager().callEvent(new CustomPlayerDeathEvent(p, e.getCause(), e.getDamager()));
 			}
 		}
 	}
@@ -215,7 +221,7 @@ public class PlayerHandler implements Listener {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					p.sendMessage(TextModule.color("&cYou're invunrable to any damage for &410 &cminutes."));
+					p.sendMessage(Color.convertToColor("&cYou're invunrable to any damage for &410 &cminutes."));
 				}
 			}.runTaskLater(Vinka.vinka, 1000);
 			
@@ -223,7 +229,7 @@ public class PlayerHandler implements Listener {
 				@Override
 				public void run() {
 					p.setInvulnerable(false);
-					p.sendMessage(TextModule.color("&cYou're no longer invunrable."));
+					p.sendMessage(Color.convertToColor("&cYou're no longer invunrable."));
 				}
 			}.runTaskLater(Vinka.vinka, 12000);
 			
@@ -242,10 +248,7 @@ public class PlayerHandler implements Listener {
 			bm.setAuthor("valkyrienyanko");
 			bm.setTitle("Server Guide");
 			List<String> pages = new ArrayList<String>();
-			pages.add(TextModule.color("&c&lPrologue\n&rWelcome to ValkMC, a unforgiving difficult survival server."));
-			pages.add(TextModule.color("&c&lCrafting\n&rGather wood to make sticks and slabs.\n\nUsing these materials, you can make your first set of tools.\n\nTo see all the recipes, use the green book in your inventory."));
-			pages.add(TextModule.color("&c&lBlocks\n&rBlocks can only be mined if you have the proper tools.\n\nBetter tools have more chance of harvesting more materials.\n\nMost blocks have gravity on place except iron blocks."));
-			pages.add(TextModule.color("&c&lMonsters\n&rMonsters should be avoided at all costs, they drain your hunger, they split into silverfish on death.\n\nThough they drop souls on death which increase your hearts when used."));
+			pages.add(TextModule.color("&c&lHelp\n&rPlease read all of /help to better understand the server."));
 			bm.setPages(pages);
 			bookGuide.setItemMeta(bm);
 			inv.addItem(bookGuide);
@@ -265,30 +268,30 @@ public class PlayerHandler implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				p.sendMessage(TextModule.color("&7Welcome, " + p.getDisplayName() + ", everything you see is in &fbeta &7and may dramatically change over the duration of one day."));
+				p.sendMessage(Color.convertToColor("Welcome, " + p.getDisplayName() + ", everything you see is in &qbeta &wand may dramatically change over the duration of one day."));
 			}
 		}.runTaskLater(Vinka.vinka, 200);
 
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				p.sendMessage(TextModule.color(
-						"&7There is currently &fno solid tutorial, &7please &fask &7someone on the &fserver &7or &fdiscord &7for help."));
+				p.sendMessage(Color.convertToColor(
+						"There is currently &qno solid tutorial, &wplease &qask &wsomeone on the &qserver &wor &qdiscord &wfor help."));
 			}
 		}.runTaskLater(Vinka.vinka, 400);
 
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				p.sendMessage(TextModule.color(
-						"&7The discord can be found in &f/help&7."));
+				p.sendMessage(Color.convertToColor(
+						"The discord can be found in &q/help&w."));
 			}
 		}.runTaskLater(Vinka.vinka, 600);
 
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				p.sendMessage(TextModule.color("&7Good luck and have fun."));
+				p.sendMessage(Color.convertToColor("&wGood luck and have fun."));
 			}
 		}.runTaskLater(Vinka.vinka, 800);
 	}
@@ -328,42 +331,7 @@ public class PlayerHandler implements Listener {
 
 		Item droppedItem = e.getItemDrop();
 
-		droppedItem.setCustomName(TextModule.color("&7" + names[new Random().nextInt(names.length)]));
+		droppedItem.setCustomName(Color.convertToColor(names[new Random().nextInt(names.length)]));
 		droppedItem.setCustomNameVisible(true);
-	}
-	
-	/*
-	 * This event is very intensive on the server!
-	 */
-	
-	@EventHandler
-	private void moveEvent(PlayerMoveEvent e) {
-		Player p = e.getPlayer();
-	
-		if (!PlayerModule.inSurvival(p))
-			return;
-		
-		Block b = e.getFrom().getBlock();
-	
-		if (b.getLightFromBlocks() == 0 && b.getY() < 20) {
-			PlayerModule.addPotionEffect(p, PotionEffectType.BLINDNESS, 100, 1);
-			PlayerModule.addPotionEffect(p, PotionEffectType.WITHER, 20, 1);
-		}
-	
-		/*if (b.getLightFromSky() == 15 && !b.isLiquid() && WorldModule.day()) {
-			
-		}*/
-	
-		/*if (b.isLiquid()) {
-			PlayerModule.addPotionEffect(p, PotionEffectType.POISON, 40, 2);
-		}*/
-		
-		/*if (BlockModule.isPlant(b.getType())) {
-			b.setType(Material.AIR);
-		}*/
-		
-		/*if (BlockModule.isLeaves(b.getRelative(BlockFace.DOWN).getType())) {
-			b.getRelative(BlockFace.DOWN).setType(Material.AIR);
-		}*/
 	}
 }

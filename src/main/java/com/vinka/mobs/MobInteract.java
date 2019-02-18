@@ -33,6 +33,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -109,12 +110,6 @@ public class MobInteract implements Listener {
 			return;
 		if (entity.getType() != EntityType.ARMOR_STAND)
 			return;
-		if (entity.getMetadata("Type") == null)
-			return;
-		if (entity.getMetadata("Type").get(0) == null)
-			return;
-		if (!entity.getMetadata("Type").get(0).asString().equals("Lootable"))
-			return;
 		
 		e.setCancelled(true);
 		e.getRightClicked().remove();
@@ -161,6 +156,9 @@ public class MobInteract implements Listener {
 		Player p = e.getPlayer();
 		World w = p.getWorld();
 		Location eloc = entity.getLocation();
+		EntityEquipment pEquip = p.getEquipment();
+		Material holdingItem = pEquip.getItemInMainHand().getType();
+		
 		if (e.getHand() != EquipmentSlot.HAND)
 			return;
 
@@ -173,12 +171,16 @@ public class MobInteract implements Listener {
 			}
 			return;
 		case CHICKEN:
-			entity.remove();
-			w.dropItemNaturally(eloc, VinkaItems.CHICKEN_SPAWN_EGG());
+			if (holdingItem != Material.WHEAT_SEEDS) {
+				entity.remove();
+				w.dropItemNaturally(eloc, VinkaItems.CHICKEN_SPAWN_EGG());
+			}
 			return;
 		case SHEEP:
-			entity.remove();
-			w.dropItemNaturally(eloc, VinkaItems.SHEEP_SPAWN_EGG());
+			if (holdingItem != Material.WHEAT) {
+				entity.remove();
+				w.dropItemNaturally(eloc, VinkaItems.SHEEP_SPAWN_EGG());
+			}
 			return;
 		default:
 			return;

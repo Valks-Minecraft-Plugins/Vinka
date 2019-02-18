@@ -8,8 +8,8 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import com.valkcore.color.Color;
 import com.valkutils.modules.PlayerModule;
-import com.valkutils.modules.TextModule;
 
 public class Food implements Listener {
 	@EventHandler
@@ -23,7 +23,7 @@ public class Food implements Listener {
 				p.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 1200, 1)); //60s
 				p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 200, 1)); //10s
 				p.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 20, 1)); //1s
-				p.sendMessage(TextModule.color("&7You just ate something disgusting! You start to feel sick.. (You can continue to eat this without anymore negative effects until the hunger effect goes away)"));
+				p.sendMessage(Color.convertToColor("You just ate something disgusting! You start to feel sick.. (You can continue to eat this without anymore negative effects until the hunger effect goes away)"));
 			}
 		}
 		
@@ -38,6 +38,7 @@ public class Food implements Listener {
 		if (type == Material.BAKED_POTATO) {
 			PlayerModule.addPotionEffect(p, PotionEffectType.SATURATION, 20, 1);
 			PlayerModule.addPotionEffect(p, PotionEffectType.REGENERATION, 100, 1);
+			PlayerModule.addPotionEffect(p, PotionEffectType.SPEED, 100, 1);
 		}
 	}
 }

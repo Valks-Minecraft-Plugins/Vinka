@@ -22,7 +22,9 @@ public class GravityBlocks {
 		case REDSTONE_TORCH:
 		case REDSTONE_WALL_TORCH:
 		case WHITE_WOOL:
+		case OBSIDIAN:
 		case OAK_STAIRS:
+		case SOUL_SAND:
 			if (PlayerModule.inSurvival(p)) {
 				if (b.getRelative(BlockFace.DOWN).getType() == Material.AIR) {
 					b.getWorld().spawnFallingBlock(b.getLocation().add(0.5d, 0, 0.5d), b.getBlockData());
