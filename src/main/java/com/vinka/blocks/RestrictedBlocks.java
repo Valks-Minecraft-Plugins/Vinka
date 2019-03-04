@@ -5,9 +5,9 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 
-import com.valkcore.color.Color;
-import com.valkutils.modules.BlockModule;
-import com.valkutils.modules.PlayerModule;
+import com.valkcore.modules.BlockModule;
+import com.valkcore.modules.PlayerModule;
+import com.valkcore.modules.TextModule;
 
 public class RestrictedBlocks {
 	public static boolean restrictedBlock(BlockBreakEvent e) {
@@ -25,7 +25,7 @@ public class RestrictedBlocks {
 		// Players need a pickaxe to mine hard blocks.
 		if (BlockModule.isOre(blocktype)) {
 			if (!PlayerModule.isPickaxe(tool)) {
-				p.sendMessage(Color.convertToColor(
+				p.sendMessage(TextModule.color(
 						"You need a &qpickaxe &wto mine " + e.getBlock().getType().name().toLowerCase() + "."));
 				return true;
 			}
@@ -34,7 +34,7 @@ public class RestrictedBlocks {
 		// Players need a shovel to mine soft blocks.
 		if (BlockModule.isSoftBlock(blocktype)) {
 			if (!PlayerModule.isShovel(tool)) {
-				p.sendMessage(Color.convertToColor(
+				p.sendMessage(TextModule.color(
 						"You need a &qshovel &wto excavate " + e.getBlock().getType().name().toLowerCase() + "."));
 				return true;
 			}
@@ -72,7 +72,7 @@ public class RestrictedBlocks {
 	
 	private static boolean yLevelRestriction(Player p, Block b, int yLevel) {
 		if (b.getY() <= yLevel) {
-			p.sendMessage(Color.convertToColor("You need a stronger pickaxe to mine deeper."));
+			p.sendMessage(TextModule.color("You need a stronger pickaxe to mine deeper."));
 			return true;
 		}
 		return false;

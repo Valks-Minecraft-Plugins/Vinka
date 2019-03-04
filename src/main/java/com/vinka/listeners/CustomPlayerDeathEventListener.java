@@ -17,8 +17,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import com.valkcore.color.Color;
-import com.valkutils.modules.PlayerModule;
+import com.valkcore.modules.PlayerModule;
+import com.valkcore.modules.TextModule;
 import com.vinka.Vinka;
 import com.vinka.events.CustomPlayerDeathEvent;
 import com.vinka.events.CustomPlayerRespawnEvent;
@@ -35,7 +35,7 @@ public class CustomPlayerDeathEventListener implements Listener {
 
 		p.getWorld().playSound(p.getLocation(), Sound.AMBIENT_CAVE, 1f, 1f);
 
-		Vinka.vinka.getServer().broadcastMessage(Color.convertToColor(deathMessage(e.getDamager().getType(), p)));
+		Vinka.vinka.getServer().broadcastMessage(TextModule.color(deathMessage(e.getDamager().getType(), p)));
 
 		p.sendTitle("", "You Died", 20, 80, 0);
 
@@ -103,8 +103,8 @@ public class CustomPlayerDeathEventListener implements Listener {
 		PlayerModule.removeAllPotionEffects(p);
 		PlayerModule.fillPlayerHealth(p);
 		PlayerModule.fillPlayerFood(p);
-		p.setLevel(0);
 		p.setExp(0);
+		p.setLevel(p.getLevel() / 2);
 	}
 
 	private void dropItemsOnDeath(Player p) {

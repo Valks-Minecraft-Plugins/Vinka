@@ -41,11 +41,12 @@ import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import com.valkutils.hologram.Hologram;
-import com.valkutils.modules.ItemModule;
-import com.valkutils.modules.PlayerModule;
-import com.valkutils.modules.TextModule;
+import com.valkcore.hologram.Hologram;
+import com.valkcore.modules.ItemModule;
+import com.valkcore.modules.PlayerModule;
+import com.valkcore.modules.TextModule;
 import com.vinka.Vinka;
+import com.vinkaitems.VinkaItem;
 import com.vinkaitems.VinkaItems;
 
 public class MobInteract implements Listener {
@@ -118,19 +119,20 @@ public class MobInteract implements Listener {
 
 		Inventory inv = Bukkit.createInventory(null, 9, "Loot");
 
-		inv.setItem(new Random().nextInt(size), VinkaItems.REDSTONE());
+		inv.setItem(new Random().nextInt(size), VinkaItems.REDSTONE().getItem());
 		if (Math.random() < 0.35)
-			inv.setItem(new Random().nextInt(size), VinkaItems.STICK());
+			inv.setItem(new Random().nextInt(size), VinkaItems.STICK().getItem());
 		if (Math.random() < 0.05)
-			inv.setItem(new Random().nextInt(size), VinkaItems.SUGAR());
+			inv.setItem(new Random().nextInt(size), VinkaItems.SUGAR().getItem());
 		if (Math.random() < 0.05)
-			inv.setItem(new Random().nextInt(size), VinkaItems.IRON_ORE());
+			inv.setItem(new Random().nextInt(size), VinkaItems.LIGHT_GRAY_DYE().getItem());
 		if (Math.random() < 0.03)
-			inv.setItem(new Random().nextInt(size), VinkaItems.GOLD_ORE());
-		for (int i = 0; i < 5; i++)
-			if (Math.random() < 0.05)
-				inv.setItem(new Random().nextInt(size),
-						VinkaItems.items.get(new Random().nextInt(VinkaItems.items.size())));
+			inv.setItem(new Random().nextInt(size), VinkaItems.DANDELION_YELLOW().getItem());
+		for (int i = 0; i < 5; i++) {
+			VinkaItem vinkaItem = VinkaItems.items.get(new Random().nextInt(VinkaItems.items.size()));
+			if (Math.random() < vinkaItem.getRarity())
+				inv.setItem(new Random().nextInt(size),vinkaItem.getItem());
+		}
 
 		e.getPlayer().openInventory(inv);
 	}
@@ -141,7 +143,7 @@ public class MobInteract implements Listener {
 		Sheep sheep = (Sheep) e.getEntity();
 		sheep.setSheared(true);
 		Location loc = sheep.getLocation();
-		loc.getWorld().dropItemNaturally(loc, VinkaItems.IRON_ORE());
+		loc.getWorld().dropItemNaturally(loc, VinkaItems.LIGHT_GRAY_DYE().getItem());
 	}
 
 	@EventHandler
@@ -173,13 +175,13 @@ public class MobInteract implements Listener {
 		case CHICKEN:
 			if (holdingItem != Material.WHEAT_SEEDS) {
 				entity.remove();
-				w.dropItemNaturally(eloc, VinkaItems.CHICKEN_SPAWN_EGG());
+				w.dropItemNaturally(eloc, VinkaItems.CHICKEN_SPAWN_EGG().getItem());
 			}
 			return;
 		case SHEEP:
-			if (holdingItem != Material.WHEAT) {
+			if (holdingItem != Material.WHEAT && holdingItem != Material.SHEARS) {
 				entity.remove();
-				w.dropItemNaturally(eloc, VinkaItems.SHEEP_SPAWN_EGG());
+				w.dropItemNaturally(eloc, VinkaItems.SHEEP_SPAWN_EGG().getItem());
 			}
 			return;
 		default:
@@ -189,11 +191,25 @@ public class MobInteract implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	private void customMobs(CreatureSpawnEvent e) {
-		if (e.getSpawnReason() == SpawnReason.NATURAL) {
+		if (e.getSpawnReason() == SpawnReason.NATURAL || e.getSpawnReason() == SpawnReason.NETHER_PORTAL) {
 			e.setCancelled(true);
 		}
 
 		if (e.getSpawnReason() == SpawnReason.SPAWNER_EGG) {
+			if (e.getLocation().getChunk().getEntities().length >= 10) {
+				e.setCancelled(true);
+				final Hologram hg = new Hologram(e.getLocation().subtract(0, 1.5, 0), "&cOnly &410 &cEntities Per Chunk!");
+				hg.setVisible(true);
+				hg.move();
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						hg.destroy();
+					}
+				}.runTaskLater(Vinka.vinka, 20 * 5);
+				return;
+			}
+			
 			if (e.getEntityType() == EntityType.WOLF) {
 				Wolf wolf = (Wolf) e.getEntity();
 				wolf.setAdult();
@@ -217,8 +233,8 @@ public class MobInteract implements Listener {
 				villager.setProfession(Profession.BLACKSMITH);
 
 				List<MerchantRecipe> merchantRecipes = new ArrayList<MerchantRecipe>();
-				merchantRecipes.add(villagerRecipe(VinkaItems.LAPIS(),
-						new ItemStack[] { VinkaItems.SUGAR(), VinkaItems.MELON_SEEDS() }));
+				merchantRecipes.add(villagerRecipe(VinkaItems.LAPIS_LAZULI().getItem(),
+						new ItemStack[] { VinkaItems.SUGAR().getItem(), VinkaItems.MELON_SEEDS().getItem() }));
 
 				ItemStack theExecutor = ItemModule.item("The Executor", "Husks don't come back.",
 						Material.DIAMOND_SWORD);
@@ -226,7 +242,7 @@ public class MobInteract implements Listener {
 				theExecutor.addEnchantment(Enchantment.KNOCKBACK, 1);
 
 				merchantRecipes.add(
-						villagerRecipe(theExecutor, new ItemStack[] { VinkaItems.STICK(), VinkaItems.OBSIDIAN() }));
+						villagerRecipe(theExecutor, new ItemStack[] { VinkaItems.STICK().getItem(), VinkaItems.OBSIDIAN().getItem() }));
 
 				villager.setRecipes(merchantRecipes);
 			}

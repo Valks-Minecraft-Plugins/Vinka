@@ -43,6 +43,7 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BookMeta;
@@ -53,11 +54,8 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
-import com.valkcore.color.Color;
-import com.valkutils.ValkUtils;
-import com.valkutils.modules.BlockModule;
-import com.valkutils.modules.PlayerModule;
-import com.valkutils.modules.TextModule;
+import com.valkcore.modules.PlayerModule;
+import com.valkcore.modules.TextModule;
 import com.vinka.Vinka;
 import com.vinka.configs.LoadPlayerFiles;
 import com.vinka.configs.PlayerFiles;
@@ -69,7 +67,7 @@ import com.vinkaitems.VinkaItems;
 
 @SuppressWarnings("unused")
 public class PlayerHandler implements Listener {
-	@EventHandler
+	/*@EventHandler
 	private void shoot(EntityShootBowEvent e) {
 		e.setCancelled(true);
 		Player p = (Player) e.getEntity();
@@ -92,15 +90,19 @@ public class PlayerHandler implements Listener {
 				}
 			}.runTaskTimer(Vinka.vinka, 0, 1);
 		}
-	}
+	}*/
 	
 	@EventHandler
 	private void fishing(PlayerFishEvent e) {
 		if (e.getCaught() != null) {
 			e.setCancelled(true);
-			Location loc = e.getPlayer().getLocation();
-			loc.getWorld().dropItemNaturally(loc, VinkaItems.RAW_SALMON());
-			e.getPlayer().sendMessage(Color.convertToColor("A salmon has given you its soul.. enjoy.."));
+			if (Math.random() < 0.5) {
+				Location loc = e.getPlayer().getLocation();
+				loc.getWorld().dropItemNaturally(loc, VinkaItems.SALMON().getItem());
+				e.getPlayer().sendMessage(TextModule.color("A salmon has given you its soul.. enjoy.."));
+			} else {
+				e.getPlayer().sendMessage(TextModule.color("The salmon got away!"));
+			}
 		}
 	}
 	
@@ -129,6 +131,12 @@ public class PlayerHandler implements Listener {
 	private void playerInteractEntity(PlayerTeleportEvent e) {
 		if (e.getPlayer().getGameMode() == GameMode.SPECTATOR && e.getCause() == TeleportCause.SPECTATE) {
 			e.setCancelled(true);
+			
+			if (e.getPlayer().getSpectatorTarget() instanceof Player) {
+				Player target = (Player) e.getPlayer().getSpectatorTarget();
+				e.getPlayer().openInventory(target.getInventory());
+			}
+				
 			e.getPlayer().setSpectatorTarget(null);
 			return;
 		}
@@ -138,6 +146,27 @@ public class PlayerHandler implements Listener {
 	private void playerInteractEvent(PlayerInteractEvent e) {
 		interactSouls(e);
 		interactElytra(e);
+		interactBook(e);
+	}
+	
+	private void interactBook(PlayerInteractEvent e) {
+		if (e.getMaterial() != Material.WRITTEN_BOOK)
+			return;
+		switch (e.getItem().getItemMeta().getDisplayName().toLowerCase()) {
+		case "recipes":
+			//e.getPlayer().openInventory(arg0)
+			break;
+		case "shop":
+			e.getPlayer().openInventory(shop());
+			break;
+		default:
+			break;
+		}
+	}
+	
+	private Inventory shop() {
+		Inventory inv = Bukkit.createInventory(null, 27, "Shop");
+		return inv;
 	}
 	
 	private void interactElytra(PlayerInteractEvent e) {
@@ -148,6 +177,27 @@ public class PlayerHandler implements Listener {
 		if (e.getHand() != EquipmentSlot.HAND) return;
 		if (e.getAction() != Action.RIGHT_CLICK_AIR) return;
 		if (!p.isOnGround()) return;
+		
+		Material handItemType = p.getEquipment().getItemInMainHand().getType();
+		
+		switch (handItemType) {
+		case BOW:
+		case WRITTEN_BOOK:
+		case FLINT_AND_STEEL:
+		case SUGAR:
+		case FISHING_ROD:
+		case BUCKET:
+		case LAVA_BUCKET:
+		case WATER_BUCKET:
+		case POTION:
+		case SPLASH_POTION:
+		case SHEARS:
+		case LEAD:
+		case WHEAT:
+			return;
+		default:
+			break;
+		}
 		
 		p.setVelocity(new Vector(0, 10, 0));
 		new BukkitRunnable() {
@@ -190,20 +240,6 @@ public class PlayerHandler implements Listener {
 	private void joinEvent(PlayerJoinEvent e) {
 		final Player p = e.getPlayer();
 		
-		Scoreboard board = Bukkit.getServer().getScoreboardManager().getMainScoreboard();
-		Team team;
-		if (board.getTeam("Default") == null) {
-			board.registerNewTeam("Default");
-			team = board.getTeam("Default");
-			team.setColor(ChatColor.GRAY);
-		} else {
-			team = board.getTeam("Default");
-		}
-		
-		if (!team.hasEntry(e.getPlayer().getName())) {
-			team.addEntry(e.getPlayer().getName());
-		}
-		
 		p.setGameMode(GameMode.SURVIVAL);
 		
 		PlayerFiles cm = PlayerFiles.getConfig(e.getPlayer());
@@ -221,7 +257,7 @@ public class PlayerHandler implements Listener {
 			new BukkitRunnable() {
 				@Override
 				public void run() {
-					p.sendMessage(Color.convertToColor("&cYou're invunrable to any damage for &410 &cminutes."));
+					p.sendMessage(TextModule.color("&cYou're invunrable to any damage for &410 &cminutes."));
 				}
 			}.runTaskLater(Vinka.vinka, 1000);
 			
@@ -229,26 +265,23 @@ public class PlayerHandler implements Listener {
 				@Override
 				public void run() {
 					p.setInvulnerable(false);
-					p.sendMessage(Color.convertToColor("&cYou're no longer invunrable."));
+					p.sendMessage(TextModule.color("&cYou're no longer invunrable."));
 				}
 			}.runTaskLater(Vinka.vinka, 12000);
 			
 			PlayerInventory inv = p.getInventory();
-			inv.addItem(VinkaItems.WOODEN_PICKAXE());
-			inv.addItem(VinkaItems.WOODEN_AXE());
-			inv.addItem(VinkaItems.WOODEN_SHOVEL());
-			inv.addItem(VinkaItems.WOODEN_HOE());
-			inv.addItem(VinkaItems.WOODEN_SWORD());
-			ItemStack ladder = VinkaItems.LADDER();
-			ladder.setAmount(15);
-			inv.addItem(ladder);
-			inv.addItem(VinkaItems.BAKED_POTATO());
+			p.getEquipment().setChestplate(VinkaItems.ELYTRA().getItem());
+			inv.addItem(VinkaItems.WOODEN_SWORD().getItem());
 			ItemStack bookGuide = new ItemStack(Material.WRITTEN_BOOK);
 			BookMeta bm = (BookMeta) bookGuide.getItemMeta();
 			bm.setAuthor("valkyrienyanko");
 			bm.setTitle("Server Guide");
 			List<String> pages = new ArrayList<String>();
-			pages.add(TextModule.color("&c&lHelp\n&rPlease read all of /help to better understand the server."));
+			pages.add(TextModule.color("&c&lHelp\n&r"
+					+ "\n/recipes"
+					+ "\n/help"
+					+ "\n/info"
+					+ "\n/cmds"));
 			bm.setPages(pages);
 			bookGuide.setItemMeta(bm);
 			inv.addItem(bookGuide);
@@ -257,9 +290,8 @@ public class PlayerHandler implements Listener {
 			p.setFlySpeed(0.1f);
 		}
 
-		p.discoverRecipes(ValkUtils.plugin.recipes);
+		p.discoverRecipes(VinkaItems.recipes);
 		
-		p.getWorld().strikeLightningEffect(p.getLocation());
 		p.getWorld().playSound(p.getLocation(), Sound.AMBIENT_CAVE, 1f, 1f);
 
 		p.setHealth(p.getMaxHealth());
@@ -268,14 +300,14 @@ public class PlayerHandler implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				p.sendMessage(Color.convertToColor("Welcome, " + p.getDisplayName() + ", everything you see is in &qbeta &wand may dramatically change over the duration of one day."));
+				p.sendMessage(TextModule.color("Welcome, " + p.getDisplayName() + ", everything you see is in &qbeta &wand may dramatically change over the duration of one day."));
 			}
 		}.runTaskLater(Vinka.vinka, 200);
 
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				p.sendMessage(Color.convertToColor(
+				p.sendMessage(TextModule.color(
 						"There is currently &qno solid tutorial, &wplease &qask &wsomeone on the &qserver &wor &qdiscord &wfor help."));
 			}
 		}.runTaskLater(Vinka.vinka, 400);
@@ -283,7 +315,7 @@ public class PlayerHandler implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				p.sendMessage(Color.convertToColor(
+				p.sendMessage(TextModule.color(
 						"The discord can be found in &q/help&w."));
 			}
 		}.runTaskLater(Vinka.vinka, 600);
@@ -291,7 +323,7 @@ public class PlayerHandler implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				p.sendMessage(Color.convertToColor("&wGood luck and have fun."));
+				p.sendMessage(TextModule.color("&wGood luck and have fun."));
 			}
 		}.runTaskLater(Vinka.vinka, 800);
 	}
@@ -331,7 +363,7 @@ public class PlayerHandler implements Listener {
 
 		Item droppedItem = e.getItemDrop();
 
-		droppedItem.setCustomName(Color.convertToColor(names[new Random().nextInt(names.length)]));
+		droppedItem.setCustomName(TextModule.color(names[new Random().nextInt(names.length)]));
 		droppedItem.setCustomNameVisible(true);
 	}
 }

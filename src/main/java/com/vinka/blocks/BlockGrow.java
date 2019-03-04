@@ -22,9 +22,10 @@ public class BlockGrow implements Listener {
 		for (Block b : adjacentBlocks) {
 			if (b.getType() != Material.GRASS_BLOCK && b.getType() != Material.DIRT) continue;
 			if (b.getRelative(BlockFace.UP).getType() != Material.AIR) continue;
-			if (Math.random() > 0.33) continue;
-			b.setType(Material.FARMLAND);
-			b.getRelative(BlockFace.UP).setType(cropType);
+			if (Math.random() < 0.33 || b.getWorld().hasStorm()) {
+				b.setType(Material.FARMLAND);
+				b.getRelative(BlockFace.UP).setType(cropType);
+			}
 		}
 	}
 }

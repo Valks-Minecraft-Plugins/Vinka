@@ -30,9 +30,9 @@ import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
-import com.valkcore.color.Color;
-import com.valkutils.modules.BlockModule;
-import com.valkutils.modules.PlayerModule;
+import com.valkcore.modules.BlockModule;
+import com.valkcore.modules.PlayerModule;
+import com.valkcore.modules.TextModule;
 import com.vinka.Vinka;
 import com.vinkaitems.VinkaItems;
 
@@ -68,8 +68,8 @@ public class Utils {
 			break;
 		case WITHER_SKELETON:
 			monster.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 2));
-			equip.setItemInMainHand(VinkaItems.STONE_SWORD());
-			equip.setItemInOffHand(VinkaItems.STONE_SWORD());
+			equip.setItemInMainHand(VinkaItems.STONE_SWORD().getItem());
+			equip.setItemInOffHand(VinkaItems.STONE_SWORD().getItem());
 			break;
 		default:
 			break;
@@ -78,7 +78,7 @@ public class Utils {
 		removeMonsterLater(monster);
 	}
 	
-	public static void removeMonsterLater(LivingEntity entity) {
+	public static void removeMonsterLater(final LivingEntity entity) {
 		if (entity instanceof Slime || entity instanceof Ghast || entity instanceof Phantom) {
 			new BukkitRunnable() {
 				@Override
@@ -87,7 +87,7 @@ public class Utils {
 				}
 			}.runTaskLater(Vinka.vinka, 20 * 30);
 		} else {
-			BukkitTask effects = new BukkitRunnable() {
+			final BukkitTask effects = new BukkitRunnable() {
 				int ticksLived = 0;
 				
 				@Override
@@ -101,7 +101,7 @@ public class Utils {
 				}
 			}.runTaskTimer(Vinka.vinka, 5, 5);
 			
-			BukkitTask ai = new BukkitRunnable() {
+			final BukkitTask ai = new BukkitRunnable() {
 				int ticksLived = 0;
 				
 				@Override
@@ -182,10 +182,10 @@ public class Utils {
 				return;
 			item.setDurability((short) (item.getDurability() + 1));
 			if (item.getDurability() + 1 > item.getType().getMaxDurability()) {
-				ItemStack sticks = VinkaItems.STICK();
+				ItemStack sticks = VinkaItems.STICK().getItem();
 				sticks.setAmount(2);
 				p.getEquipment().setItemInMainHand(sticks);
-				p.sendMessage(Color.convertToColor("Your tool snapped in two."));
+				p.sendMessage(TextModule.color("Your tool snapped in two."));
 			}
 		}
 	}
@@ -243,7 +243,7 @@ public class Utils {
 		EntityEquipment monsterEquip = monster.getEquipment();
 		EntityEquipment playerEquip = p.getEquipment();
 
-		monster.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 3));
+		//monster.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 3));
 
 		monster.getEquipment().setHelmet(skull);
 
@@ -262,8 +262,13 @@ public class Utils {
 	}
 
 	public static boolean validSpawningLocation(Location testLoc) {
-		if (testLoc.getBlock().getType() == Material.AIR
+		/*if (testLoc.getBlock().getType() == Material.AIR
 				&& testLoc.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR) {
+			if (testLoc.getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
+				return true;
+			}
+		}*/
+		if (testLoc.getBlock().getRelative(BlockFace.UP).getType() == Material.AIR) {
 			if (testLoc.getBlock().getRelative(BlockFace.DOWN).getType() != Material.AIR) {
 				return true;
 			}
@@ -285,7 +290,7 @@ public class Utils {
 			@Override
 			public void run() {
 				Location newLoc = new Location(loc.getWorld(), loc.getX(), loc.getY() - 1.5, loc.getZ());
-				ArmorStand as = (ArmorStand) loc.getWorld().spawn(newLoc, ArmorStand.class);
+				final ArmorStand as = (ArmorStand) loc.getWorld().spawn(newLoc, ArmorStand.class);
 				as.setVisible(false);
 				as.setInvulnerable(true);
 				as.setGravity(false);

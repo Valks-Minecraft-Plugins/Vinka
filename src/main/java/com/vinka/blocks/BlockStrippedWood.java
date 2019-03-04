@@ -6,8 +6,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EntityEquipment;
 
-import com.valkutils.modules.BlockModule;
-import com.valkutils.modules.PlayerModule;
+import com.valkcore.modules.BlockModule;
+import com.valkcore.modules.PlayerModule;
 
 public class BlockStrippedWood implements Listener {
 	@EventHandler

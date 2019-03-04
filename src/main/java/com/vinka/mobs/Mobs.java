@@ -20,7 +20,7 @@ public class Mobs implements Listener {
 			return;
 		e.setCancelled(true);
 		Location loc = e.getEntity().getLocation();
-		loc.getWorld().dropItemNaturally(loc, VinkaItems.SUGAR());
+		loc.getWorld().dropItemNaturally(loc, VinkaItems.SUGAR().getItem());
 	}
 
 	@EventHandler

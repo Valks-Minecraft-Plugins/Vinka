@@ -15,17 +15,15 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.valkutils.modules.MobModule;
-import com.valkutils.modules.WorldModule;
+import com.valkcore.modules.MobModule;
+import com.valkcore.modules.WorldModule;
 import com.vinka.utils.Utils;
 import com.vinkaitems.VinkaItems;
 
 public class MobDeath implements Listener {
 	@EventHandler
 	private void entitySplitEvent(SlimeSplitEvent e) {
-		if (WorldModule.day()) {
-			e.setCancelled(true);
-		}
+		e.setCancelled(true);
 	}
 
 	@EventHandler
@@ -79,7 +77,7 @@ public class MobDeath implements Listener {
 		}
 		
 		// Sugar on Death
-		ItemStack sugar = VinkaItems.SUGAR();
+		ItemStack sugar = VinkaItems.SUGAR().getItem();
 		switch (e.getEntityType()) {
 		case SLIME:
 		case ZOMBIE:

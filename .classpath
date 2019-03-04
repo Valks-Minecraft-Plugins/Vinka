@@ -24,9 +24,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/valkyrienyanko/Desktop/server/plugins/ValkUtils.jar"/>
-	<classpathentry kind="src" path="/ValkUtils"/>
-	<classpathentry kind="lib" path="C:/Users/valkyrienyanko/Desktop/server/plugins/ValkCore.jar"/>
-	<classpathentry kind="lib" path="C:/Users/valkyrienyanko/Desktop/server/plugins/VinkaItems.jar"/>
+	<classpathentry kind="src" path="/VinkaItems"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
